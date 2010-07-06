@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+    <package name="charm" namespace="/" extends="struts-default">
+        <default-action-ref name="listProjects"/>
+        
+        <action name="diffBranches" class="com.indeed.charm.actions.DiffBranchesAction">
+            <result>/view-diffs.jsp</result>
+        </action>
+        <action name="diffBranchToTrunk" class="com.indeed.charm.actions.DiffBranchToTrunkAction">
+            <result>/view-diffs.jsp</result>
+        </action>
+        <action name="diffTagToTrunk" class="com.indeed.charm.actions.DiffTagToTrunkAction">
+            <result>/view-diffs.jsp</result>
+        </action>
+        <action name="logTrunkSinceBranch" class="com.indeed.charm.actions.LogTrunkSinceBranchAction">
+            <result>/view-log.jsp</result>
+        </action>
+        <action name="logTrunkSinceTag" class="com.indeed.charm.actions.LogTrunkSinceTagAction">
+            <result>/view-log.jsp</result>
+        </action>
+        <action name="logBranch" class="com.indeed.charm.actions.LogBranchAction">
+            <result>/view-log.jsp</result>
+        </action>
+        <action name="listBranches" class="com.indeed.charm.actions.ListBranchesAction">
+            <result>/view-branches.jsp</result>
+        </action>
+        <action name="listTags" class="com.indeed.charm.actions.ListTagsAction">
+            <result>/view-tags.jsp</result>
+        </action>
+        <action name="listProjects" class="com.indeed.charm.actions.ListProjectsAction">
+            <result>/view-projects.jsp</result>
+        </action>
+        <action name="checkoutBranch" class="com.indeed.charm.actions.CheckoutBranchAction">
+            <result>/show-job.jsp</result>
+        </action>
+        <action name="mergeToBranch" class="com.indeed.charm.actions.MergeToBranchAction">
+            <result name="login">/merge-login.jsp</result>
+            <result>/show-job.jsp</result>
+        </action>
+        <action name="cleanupBranchWC" class="com.indeed.charm.actions.CleanupBranchWCAction">
+            <result type="redirect">listBranches?project=${project}</result>
+        </action>
+    </package>
+</struts>

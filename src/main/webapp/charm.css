@@ -1,0 +1,4 @@
+body,td,div,p,a{font-family:arial,sans-serif; font-size:10pt}
+th { text-align: left; }
+td,th { padding: 0.5em 0.75em 0.5em 0.75em; }
+td { border-bottom: 1px solid #d6dae4; vertical-align: top; }

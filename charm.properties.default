@@ -1,0 +1,43 @@
+#
+# charm.properties configures your CHARM environment
+#
+
+# where to store temporary files (such as working directories for merges)
+tmp.dir=/tmp
+
+# Type of VCS repository (default: svn for Subversion)
+repo.type=svn
+
+# Base URL of VCS repository
+repo.url=
+
+# Read-only username and password for VCS repository
+repo.user=
+repo.password=
+
+# Additional roots to search for projects (relative to repo.url)
+# Example: ",common,shared" would search the root (/), /common, and /shared
+repo.roots=
+
+# Path to use relative to project base directory to find development trunk
+repo.trunk.path=/trunk/
+
+# Path to use relative to project base directory to find release deployment branches
+repo.branch.path=/branches/deploy/
+
+# Path to use relative to project base directory to find published library tags
+repo.tags.path=/tags/published/
+
+# URL to use to view a revision
+repo.rev.url=
+
+# Number of days of history to search when looking for deployment branches
+release.history.maxdays=365
+
+# Java regular expressions to use to linkify log messages
+# Example shows JIRA issues and Subversion revisions linked to Atlassian Fisheye
+#linkify.patterns=JIRA,FISHEYE
+#linkify.pattern.JIRA=(?!UTF-8)(\\b(UX|[A-Z]{3,20})-\\d{1,6}\\b)
+#linkify.replacement.JIRA=<a target="_blank" href="https://bugs.example.com/browse/$1">$0</a>
+#linkify.pattern.FISHEYE=(\\br([1-9]\\d*)\\b)
+#linkify.replacement.FISHEYE=<a target="_blank" href="https://fisheye.example.com/changelog/MainRepo/?cs=$2">$1</a>
