@@ -4,6 +4,7 @@
 <head>
     <title>CHARM SVN Diff Summary</title>
     <style type="text/css"><jsp:include page="charm.css"/></style>
+    <link rel="shortcut icon" href="/charm/favicon.ico"/>
 </head>
 <body>
 <h2><s:property value="path1"/> vs. <s:property value="path2"/></h2>

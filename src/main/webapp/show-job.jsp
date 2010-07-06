@@ -18,6 +18,7 @@
 <head>
     <title>CHARM SVN Revision</title>
     <style type="text/css"><jsp:include page="charm.css"/></style>
+    <link rel="shortcut icon" href="/charm/favicon.ico"/>
     <s:if test="job.running">
         <meta http-equiv="REFRESH" content="1; URL=<s:property value="refreshUrl" escape="false"/>">
     </s:if>

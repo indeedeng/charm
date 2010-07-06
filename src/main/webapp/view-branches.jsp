@@ -3,6 +3,7 @@
 <head>
     <title>CHARM SVN Release Branches</title>
     <style type="text/css"><jsp:include page="charm.css"/></style>
+    <link rel="shortcut icon" href="/charm/favicon.ico"/>
 </head>
 <body>
 <h2><s:property value="project"/> branches</h2>

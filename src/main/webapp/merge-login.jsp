@@ -3,6 +3,7 @@
 <head>
     <title>CHARM SVN Login</title>
     <style type="text/css"><jsp:include page="charm.css"/></style>
+    <link rel="shortcut icon" href="/charm/favicon.ico"/>
 </head>
 <body>
 <h2>SVN User/Password Required For Merge</h2>
