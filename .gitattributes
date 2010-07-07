@@ -1,5 +1,4 @@
 * text=auto !eol
-/README.txt -text
 /charm.properties.default -text
 /pom.xml -text
 src/main/Main.iml -text
