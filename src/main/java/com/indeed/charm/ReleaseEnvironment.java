@@ -12,6 +12,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.*;
 import com.indeed.charm.svn.SubversionClient;
 
+import javax.servlet.ServletContext;
+
 /**
  */
 public class ReleaseEnvironment {
@@ -22,14 +24,34 @@ public class ReleaseEnvironment {
     private List<LinkifyPattern> linkifyPatterns;
     private BiMap<String,String> repoNameMap;
 
+    protected static String getCharmPropertiesPath(ServletContext context) {
+        String path = null;
+        if (context != null) {
+            path = context.getInitParameter("charm.properties");
+        }
+        if (path == null || path.trim().length() == 0) {
+            path = System.getProperty("charm.properties", null);
+        }
+        return path;
+    }
+
     public ReleaseEnvironment() {
-        properties = new Properties();
-        try {
-            InputStream in = new FileInputStream(System.getProperty("charm.properties", ""));
-            properties.load(in);
-            log.info(properties);
-        } catch (IOException e) {
-            log.error("Failed to load properties", e);
+        this(null);
+    }
+    
+    public ReleaseEnvironment(ServletContext context) {
+        final String propertiesPath = getCharmPropertiesPath(context);
+        if (propertiesPath != null) {
+            properties = new Properties();
+            try {
+                InputStream in = new FileInputStream(propertiesPath);
+                properties.load(in);
+                log.info(properties);
+            } catch (IOException e) {
+                log.error("Failed to load properties", e);
+            }
+        } else {
+            log.error("Missing charm.properties");
         }
     }
 

@@ -36,7 +36,7 @@ public class ContextListener implements ServletContextListener,
         Logger.getLogger("com.indeed.charm").setLevel(Level.INFO);
         try {
             final ServletContext ctx = sce.getServletContext();
-            final ReleaseEnvironment env = new ReleaseEnvironment();
+            final ReleaseEnvironment env = new ReleaseEnvironment(sce.getServletContext());
             ctx.setAttribute(ReleaseEnvironment.class.getSimpleName(), env);
             // TODO: select VCS client based on charm.properties
             final VCSClient svnClient = new SubversionClient(env);
