@@ -9,19 +9,22 @@ import java.io.FileInputStream;
 import java.util.Properties;
 import java.util.Date;
 import java.util.List;
+import java.util.Iterator;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.*;
 import com.indeed.charm.svn.SubversionClient;
+import com.indeed.charm.ivy.IvyDependency;
 
 /**
  */
 public class ReleaseEnvironment {
     private static Logger log = Logger.getLogger(ReleaseEnvironment.class);
+    public static Splitter versionSplitter = Splitter.on(".");
 
     private Properties properties;
     private List<LinkifyPattern> linkifyPatterns;
-    public static Splitter versionSplitter = Splitter.on(".");
+    private BiMap<String,String> repoNameMap;
 
     public ReleaseEnvironment() {
         properties = new Properties();
@@ -99,6 +102,34 @@ public class ReleaseEnvironment {
         return value;
     }
 
+    private BiMap<String, String> getRepoNameMap() {
+        if (repoNameMap == null) {
+            final BiMap<String, String> map = HashBiMap.create();
+            Iterable<String> entries = Splitter.on(',').trimResults().split(properties.getProperty("repo.name.map", ""));
+            for (String entry : entries) {
+                Iterator<String> pair = Splitter.on(':').trimResults().split(entry).iterator();
+                final String repo = pair.hasNext() ? pair.next() : null;
+                final String name = pair.hasNext() ? pair.next() : null;
+                if (repo != null && name != null) {
+                    map.put(repo, name);
+                }
+            }
+            repoNameMap = map;
+        }
+        return repoNameMap;
+    }
+
+    public String getNameForRepo(String repo) {
+        return getRepoNameMap().get(repo);
+    }
+
+    public String getRepoForName(String name) {
+        return getRepoNameMap().inverse().get(name);
+    }
+
+    public void putRepoName(String repo, String name) {
+        getRepoNameMap().put(repo, name);
+    }
 
     public Date getEarliestReleaseDate() {
         long maxDays = Long.parseLong(properties.getProperty("release.history.maxdays", "365"));
@@ -129,6 +160,10 @@ public class ReleaseEnvironment {
 
     public String getIvyOrg() {
         return properties.getProperty("ivy.org", "");
+    }
+
+    public String getIvyRepoUrl() {
+        return properties.getProperty("ivy.repo.url", "");
     }
 
     public static String normalizeVersion(String in, int width) {

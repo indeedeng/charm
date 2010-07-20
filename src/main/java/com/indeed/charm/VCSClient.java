@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 /**
  */
 public interface VCSClient {
+
     public enum Ordering {
         NORMAL,
         REVERSE_AGE,
@@ -62,12 +63,16 @@ public interface VCSClient {
 
     long checkoutBranch(String project, String branchDate, File workingDir) throws VCSException, IOException;
 
+    CommitInfo commit(File file, String message) throws VCSException;
+
     CommitInfo mergeToBranch(String project, long revision, String branchDate, String messagePrefix, File workingDir) throws VCSException, IOException;
 
     LogEntry getTrunkLogEntry(String project, long revision) throws VCSException;
 
     LogEntry getBranchLogEntry(String project, String branchDate, long revision) throws VCSException;
 
-    void getFile(String path, long revision, ByteArrayOutputStream outputStream) throws VCSException;
+    long getFile(String path, long revision, ByteArrayOutputStream outputStream) throws VCSException;
+
+    long getLatestRevision(String path) throws VCSException;
 
 }

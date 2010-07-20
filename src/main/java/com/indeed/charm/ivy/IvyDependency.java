@@ -1,6 +1,5 @@
 package com.indeed.charm.ivy;
 
-import com.indeed.charm.VCSClient;
 import com.indeed.charm.ReleaseEnvironment;
 
 /**
@@ -58,13 +57,35 @@ public class IvyDependency implements Comparable<IvyDependency> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IvyDependency that = (IvyDependency) o;
+
+        if (homeOrg != that.homeOrg) return false;
+        if (latestRev != null ? !latestRev.equals(that.latestRev) : that.latestRev != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (org != null ? !org.equals(that.org) : that.org != null) return false;
+        if (path != null ? !path.equals(that.path) : that.path != null) return false;
+        if (rev != null ? !rev.equals(that.rev) : that.rev != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = org != null ? org.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        result = 31 * result + (rev != null ? rev.hashCode() : 0);
+        result = 31 * result + (homeOrg ? 1 : 0);
+        result = 31 * result + (latestRev != null ? latestRev.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
-        return "{" +
-                "org='" + org + '\'' +
-                ", name='" + name + '\'' +
-                ", rev='" + rev + '\'' +
-                ", homeOrg='" + homeOrg + '\'' +
-                ", latestRev='" + latestRev + '\'' +
-                '}';
+        return org + '/' + name + ';' + rev;
     }
 }

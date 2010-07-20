@@ -9,20 +9,33 @@
     </script>
 </head>
 <body>
-<h2><s:property value="project"/> dependencies</h2>
-<s:if test="%{branchDate != null}">
-    <h2><s:property value="branchDate"/></h2>
-</s:if>
-<s:else>
-    <h3>trunk</h3>
-</s:else>
+<h2>
+    <s:property value="project"/>
+    <s:if test="%{branchDate != null}">
+        <s:property value="branchDate"/>
+    </s:if>
+    <s:elseif test="%{tag != null}">
+        <s:property value="tag"/>
+    </s:elseif>
+    <s:else>
+        trunk
+    </s:else>
+        dependencies
+</h2>
+<s:url var="analyzeUrl" action="listDependencyConflicts">
+    <s:param name="project" value="project"/>
+    <s:param name="branchDate" value="branchDate"/>
+    <s:param name="tag" value="tag"/>
+</s:url>
+<s:a href="%{analyzeUrl}">analyze conflicts</s:a>
 <s:if test="%{!showAll}">
     <s:url var="showAllUrl">
         <s:param name="project" value="project"/>
         <s:param name="branchDate" value="branchDate"/>
+        <s:param name="tag" value="tag"/>
         <s:param name="showAll" value="true"/>
     </s:url>
-    <s:a href="%{showAllUrl}">show all orgs</s:a>
+    <br/><s:a href="%{showAllUrl}">show all orgs</s:a>
 </s:if>
 <s:url action="checkForTrunkDiffs" var="checkTrunkForDiffsUrl"/>
 <script type="text/javascript">
@@ -70,24 +83,43 @@
             <s:url var="projectUrl" action="listTags">
                 <s:param name="project" value="path"/>
             </s:url>
+            <s:url var="depsUrl">
+                <s:param name="project" value="name"/>
+                <s:param name="tag" value="rev"/>
+            </s:url>
             <s:url var="logUrl" action="logTrunkSinceTag">
                 <s:param name="project" value="path"/>
                 <s:param name="tag" value="rev"/>
             </s:url>
             <td><s:a href="%{projectUrl}"><s:property value="name"/></s:a></td>
-            <td><s:property value="rev"/></td>
+            <td><s:a href="%{depsUrl}"><s:property value="rev"/></s:a></td>
             <td><s:a href="%{logUrl}"><span id='<s:property value="%{path}"/>__<s:property value="%{rev}"/>' class="changes">changes on trunk</span></s:a></td>
             <s:if test="%{rev == latestRev}">
                 <td><s:property value="latestRev"/></td>
                 <td>&nbsp;</td>
+                <td>&nbsp;</td>
             </s:if>
             <s:else>
-                <td><b><s:property value="latestRev"/></b></td>
+                <s:url var="depsUrl">
+                    <s:param name="project" value="name"/>
+                    <s:param name="tag" value="latestRev"/>
+                </s:url>
+                <td><b><s:a href="%{depsUrl}"><s:property value="latestRev"/></s:a></b></td>
                 <s:url var="logLatestUrl" action="logTrunkSinceTag">
                     <s:param name="project" value="path"/>
                     <s:param name="tag" value="latestRev"/>
                 </s:url>
                 <td><s:a href="%{logLatestUrl}"><span id='<s:property value="%{path}"/>__<s:property value="%{latestRev}"/>' class="changes">changes on trunk</span></s:a></td>
+                <s:if test="branchDate != null">
+                    <s:url var="upgradeUrl" action="upgradeIvyDep">
+                        <s:param name="project" value="project"/>
+                        <s:param name="branchDate" value="branchDate"/>
+                        <s:param name="module" value="name"/>
+                        <s:param name="oldRev" value="rev"/>
+                        <s:param name="newRev" value="latestRev"/>
+                    </s:url>
+                    <td><s:a href="%{upgradeUrl}">upgrade</s:a></td>
+                </s:if>
             </s:else>
         </tr>
     </s:if>
@@ -96,6 +128,7 @@
             <td><s:property value="org"/></td>
             <td><s:property value="name"/></td>
             <td><s:property value="rev"/></td>
+            <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>

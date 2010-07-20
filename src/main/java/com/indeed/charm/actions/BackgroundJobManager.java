@@ -14,33 +14,34 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  */
-public class BranchJobManager {
+public class BackgroundJobManager {
 
-    private final List<BranchJob> branchJobs = Lists.newLinkedList();
-    private final ExecutorService service = Executors.newFixedThreadPool(1, new ThreadFactory() {
+    private final List<BackgroundJob> backgroundJobs = Lists.newLinkedList();
+    // TODO: configurable thread pool
+    private final ExecutorService service = Executors.newFixedThreadPool(10, new ThreadFactory() {
         public Thread newThread(Runnable r) {
-            return new Thread(null, r, BranchJobManager.class.getSimpleName());
+            return new Thread(null, r, BackgroundJobManager.class.getSimpleName());
         }
     });
-    private final Map<Long, BranchJob> history = new MapMaker()
+    private final Map<Long, BackgroundJob> history = new MapMaker()
             .softValues()
             .makeMap();
     private final AtomicLong lastId = new AtomicLong(0);
 
-    public void submit(BranchJob job) {
+    public <T> void submit(BackgroundJob<T> job) {
         long id = lastId.incrementAndGet();
         job.setId(id);
-        Future<Boolean> future = service.submit(job);
+        Future<T> future = service.submit(job);
         job.setFuture(future);
-        branchJobs.add(job);
+        backgroundJobs.add(job);
         history.put(id, job);
     }
 
-    public List<BranchJob> getRecentJobs() {
-        List<BranchJob> recent = Lists.newArrayListWithCapacity(branchJobs.size());
-        ListIterator<BranchJob> jobs = branchJobs.listIterator();
+    public List<BackgroundJob> getRecentJobs() {
+        List<BackgroundJob> recent = Lists.newArrayListWithCapacity(backgroundJobs.size());
+        ListIterator<BackgroundJob> jobs = backgroundJobs.listIterator();
         while (jobs.hasNext()) {
-            BranchJob job = jobs.next();
+            BackgroundJob job = jobs.next();
             recent.add(job); // inactive jobs get to be returned once...
             if (job.getFuture().isDone() || job.getFuture().isCancelled()) {
                 jobs.remove();
@@ -49,7 +50,8 @@ public class BranchJobManager {
         return recent;
     }
 
-    public BranchJob getJobForId(long id) {
+    @SuppressWarnings("unchecked")
+    public <T> BackgroundJob<T> getJobForId(long id) {
         return history.get(id);
     }
 

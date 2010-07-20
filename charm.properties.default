@@ -31,6 +31,11 @@ repo.tags.path=/tags/published/
 # URL to use to view a revision
 repo.rev.url=
 
+# Map of repository paths to library names (used in dependency analysis features)
+# Not required if the library name replaces a "/" in repo path with a "-", e.g. common/util:common-util
+# Comma-separated list of colon-separated pairs (repo:name). Example:
+#repo.name.map=util:common-util,skunkworks/stealth:ignore-me
+
 # Number of days of history to search when looking for deployment branches
 release.history.maxdays=365
 
@@ -50,3 +55,6 @@ ivy.filename=ivy.xml
 
 # If using properties for revisions in ivy.xml files, path to properties file used to resolve those
 #ivy.properties=config/ivy/libraries.properties
+
+# URL for Ivy repository
+#ivy.repo.url=http://example/repository

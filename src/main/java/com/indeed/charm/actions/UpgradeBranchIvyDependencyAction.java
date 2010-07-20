@@ -2,22 +2,29 @@ package com.indeed.charm.actions;
 
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
+import com.indeed.charm.ivy.IvyUtils;
 import com.indeed.charm.model.CommitInfo;
+import com.google.common.io.Files;
+import com.google.common.base.Suppliers;
+import com.google.common.base.Supplier;
+import com.google.common.base.Charsets;
 
 /**
  */
-public class MergeToBranchAction extends BaseBranchAction {
-    private static Logger log = Logger.getLogger(CheckoutBranchAction.class);
+public class UpgradeBranchIvyDependencyAction extends BaseBranchAction {
+    private static Logger log = Logger.getLogger(UpgradeBranchIvyDependencyAction.class);
 
     private Long jobId;
     private String user;
     private String password;
-    private Long revision;
+    private String messagePrefix = "";
+    private String module;
+    private String oldRev;
+    private String newRev;
     private BackgroundJob<Boolean> job;
 
     @Override
@@ -33,7 +40,7 @@ public class MergeToBranchAction extends BaseBranchAction {
         if (user == null || password == null) {
             return LOGIN;
         }
-        if (revision == null) {
+        if (module == null || oldRev == null || newRev == null) {
             return ERROR;
         }
         final File branchDir = env.getBranchWorkingDirectory(project, branchDate, user);
@@ -46,25 +53,36 @@ public class MergeToBranchAction extends BaseBranchAction {
                     setStatus("Checking out " + project + " branch " + branchDate);
                     long r = vcsClient.checkoutBranch(project, branchDate, branchDir);
                     log("Checked out branch dir at revision " + r);
-                    setStatus("Merging " + revision);
-                    log("svn merge -r" + (revision-1) + ":" + revision + " && svn commit");
-                    CommitInfo info = vcsClient.mergeToBranch(project, revision, branchDate, "", branchDir);
-                    log("Merge/commit complete");
+                    setStatus("Updating ivy.xml");
+                    log("...update ivy.xml...");
+                    IvyUtils util = new IvyUtils(env);
+                    File ivyFile = new File(branchDir, env.getIvyFileName());
+                    Reader ivyReader = Files.newReader(ivyFile, Charsets.UTF_8);
+                    CharArrayWriter ivyWriter = new CharArrayWriter();
+                    boolean changed = util.upgradeDependency(ivyReader, ivyWriter, env.getIvyOrg(), module, oldRev, newRev);
+                    if (changed) {
+                        Files.write(ivyWriter.toString(), ivyFile, Charsets.UTF_8);
+                        log("...wrote new ivy.xml...");
+                    } else {
+                        log("...no changes made...");
+                    }
+                    CommitInfo info = vcsClient.commit(ivyFile, messagePrefix + " upgrade " + module + " from " + oldRev + " to " + newRev);
+                    log("Commit complete");
                     log(info.toString());
                     return true;
                 } catch (VCSException e) {
-                    log.error("Failed to merge to branch", e);
-                    log("Merge failure: " + e.getMessage());
+                    log.error("Failed to commit branch ivy update", e);
+                    log("Failure: " + e.getMessage());
                 } catch (IOException e) {
-                    log.error("Failed to merge to branch", e);
-                    log("Merge failure: " + e.getMessage());
+                    log.error("Failed to write ivy dependency update", e);
+                    log("Failure: " + e.getMessage());
                 }
                 setStatus("FAILED");
                 return false;
             }
 
             public String getTitle() {
-                return "Merge " + revision + " to " + project + " " + branchDate;
+                return "Upgrade " + module + " from " + oldRev + " to " + newRev + " on " + project + " " + branchDate;
             }
 
             @Override
@@ -78,12 +96,36 @@ public class MergeToBranchAction extends BaseBranchAction {
         return SUCCESS;
     }
 
-    public Long getRevision() {
-        return revision;
+    public String getMessagePrefix() {
+        return messagePrefix;
     }
 
-    public void setRevision(Long revision) {
-        this.revision = revision;
+    public void setMessagePrefix(String messagePrefix) {
+        this.messagePrefix = messagePrefix;
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public String getOldRev() {
+        return oldRev;
+    }
+
+    public void setOldRev(String oldRev) {
+        this.oldRev = oldRev;
+    }
+
+    public String getNewRev() {
+        return newRev;
+    }
+
+    public void setNewRev(String newRev) {
+        this.newRev = newRev;
     }
 
     public BackgroundJob<Boolean> getJob() {

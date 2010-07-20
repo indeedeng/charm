@@ -5,19 +5,19 @@ import java.util.concurrent.Future;
 
 /**
  */
-public abstract class BranchJob implements Callable<Boolean> {
-    private Future<Boolean> future;
+public abstract class BackgroundJob<T> implements Callable<T> {
+    private Future<T> future;
     private String status = "PENDING";
-    private final StringBuilder log = new StringBuilder();
+    protected final StringBuilder logBuilder = new StringBuilder();
 
     private Long id;
 
     public void log(String message) {
-        log.append(message).append("\n");
+        logBuilder.append(message).append("\n");
     }
 
     public String getLog() {
-        return log.toString();
+        return logBuilder.toString();
     }
     
     public String getStatus() {
@@ -35,11 +35,11 @@ public abstract class BranchJob implements Callable<Boolean> {
         this.status = status;
     }
 
-    public Future<Boolean> getFuture() {
+    public Future<T> getFuture() {
         return future;
     }
 
-    public void setFuture(Future<Boolean> future) {
+    public void setFuture(Future<T> future) {
         this.future = future;
     }
 
@@ -59,5 +59,5 @@ public abstract class BranchJob implements Callable<Boolean> {
         return future == null || (!future.isDone() && !future.isCancelled());
     }
 
-    protected abstract String getTitle();
+    public abstract String getTitle();
 }

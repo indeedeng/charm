@@ -8,11 +8,12 @@ src/main/java/com/indeed/charm/ProjectsLoader.java -text
 src/main/java/com/indeed/charm/ReleaseEnvironment.java -text
 src/main/java/com/indeed/charm/VCSClient.java -text
 src/main/java/com/indeed/charm/VCSException.java -text
+src/main/java/com/indeed/charm/actions/BackgroundJob.java -text
+src/main/java/com/indeed/charm/actions/BackgroundJobManager.java -text
 src/main/java/com/indeed/charm/actions/BaseBranchAction.java -text
 src/main/java/com/indeed/charm/actions/BaseBranchLogAction.java -text
-src/main/java/com/indeed/charm/actions/BranchJob.java -text
-src/main/java/com/indeed/charm/actions/BranchJobManager.java -text
 src/main/java/com/indeed/charm/actions/CheckForTrunkDiffsAjaxAction.java -text
+src/main/java/com/indeed/charm/actions/CheckUpgradeDependencyConflictsAction.java -text
 src/main/java/com/indeed/charm/actions/CheckoutBranchAction.java -text
 src/main/java/com/indeed/charm/actions/CleanupBranchWCAction.java -text
 src/main/java/com/indeed/charm/actions/DiffBranchToTrunkAction.java -text
@@ -22,6 +23,7 @@ src/main/java/com/indeed/charm/actions/DiffTagToTagAction.java -text
 src/main/java/com/indeed/charm/actions/DiffTagToTrunkAction.java -text
 src/main/java/com/indeed/charm/actions/DisplayLogVisitor.java -text
 src/main/java/com/indeed/charm/actions/ListBranchesAction.java -text
+src/main/java/com/indeed/charm/actions/ListDependencyConflictsAction.java -text
 src/main/java/com/indeed/charm/actions/ListProjectsAction.java -text
 src/main/java/com/indeed/charm/actions/ListTagsAction.java -text
 src/main/java/com/indeed/charm/actions/LogBranchAction.java -text
@@ -30,9 +32,11 @@ src/main/java/com/indeed/charm/actions/LogTrunkSinceBranchAction.java -text
 src/main/java/com/indeed/charm/actions/LogTrunkSinceTagAction.java -text
 src/main/java/com/indeed/charm/actions/MergeToBranchAction.java -text
 src/main/java/com/indeed/charm/actions/ShowIvyDependenciesAction.java -text
+src/main/java/com/indeed/charm/actions/UpgradeBranchIvyDependencyAction.java -text
 src/main/java/com/indeed/charm/actions/VCSActionSupport.java -text
 src/main/java/com/indeed/charm/ivy/IvyDependency.java -text
 src/main/java/com/indeed/charm/ivy/IvyLoader.java -text
+src/main/java/com/indeed/charm/ivy/IvyUtils.java -text
 src/main/java/com/indeed/charm/model/CommitInfo.java -text
 src/main/java/com/indeed/charm/model/DiffStatus.java -text
 src/main/java/com/indeed/charm/model/DirEntry.java -text
@@ -53,10 +57,13 @@ src/main/webapp/ajax.js -text
 src/main/webapp/charm.css -text
 src/main/webapp/favicon.ico -text
 src/main/webapp/merge-login.jsp -text
+src/main/webapp/show-conflicts.jsp -text
 src/main/webapp/show-job.jsp -text
+src/main/webapp/upgrade-login.jsp -text
 src/main/webapp/view-branches.jsp -text
 src/main/webapp/view-deps.jsp -text
 src/main/webapp/view-diffs.jsp -text
 src/main/webapp/view-log.jsp -text
 src/main/webapp/view-projects.jsp -text
 src/main/webapp/view-tags.jsp -text
+src/main/webapp/wait20.gif -text svneol=unset#unset

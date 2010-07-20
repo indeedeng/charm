@@ -29,8 +29,8 @@ public class CleanupBranchWCAction extends BaseBranchAction {
     @Override
     public String execute() throws Exception {
         final File branchDir = env.getBranchWorkingDirectory(project, branchDate, user);
-        BranchJob job = new BranchJob() {
-            protected String getTitle() {
+        BackgroundJob<Boolean> job = new BackgroundJob<Boolean>() {
+            public String getTitle() {
                 return "Cleanup Working Directory " + branchDir;
             }
 
@@ -43,7 +43,7 @@ public class CleanupBranchWCAction extends BaseBranchAction {
                 return true;
             }
         };
-        branchJobManager.submit(job);
+        backgroundJobManager.submit(job);
         return SUCCESS;
     }
 

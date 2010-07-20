@@ -386,6 +386,15 @@ public class SubversionClient implements VCSClient {
         }
     }
 
+    public CommitInfo commit(File file, String message) throws VCSException {
+        try {
+            final SVNCommitClient commitClient = clientManager.getCommitClient();
+            return new SVNCommitInfoWrapper(commitClient.doCommit(new File[]{ file }, false, message, null, null, false, false, SVNDepth.INFINITY));
+        } catch (SVNException e) {
+            throw new VCSException(e);
+        }
+    }
+
     public LogEntry getTrunkLogEntry(String project, long revision) throws VCSException {
         try {
             final SVNLogClient logClient = clientManager.getLogClient();
@@ -422,18 +431,32 @@ public class SubversionClient implements VCSClient {
         }
     }
 
-    public void getFile(String path, long revision, ByteArrayOutputStream outputStream) throws VCSException {
+    public long getFile(String path, long revision, ByteArrayOutputStream outputStream) throws VCSException {
+        long rev = -1;
         try {
-            repo.getFile(path, revision, null, outputStream);
+            SVNProperties props = new SVNProperties();
+            repo.getFile(path, revision, props, outputStream);
+            final String revStr = props.getStringValue(SVNProperty.COMMITTED_REVISION);
+            if (revStr != null) {
+                try {
+                    rev = Long.parseLong(revStr);
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (SVNException e) {
             throw new VCSException(e);
         }
+        return rev;
+    }
 
+    public long getLatestRevision(String path) throws VCSException {
+        return getFile(path, -1, null);
     }
 
     public static void main(String[] args) throws Exception {
         VCSClient sc = new SubversionClient(new ReleaseEnvironment());
-
+        System.out.println(sc.getLatestRevision(args[0]));
 //        final ISVNDiffStatusHandler dsHandler = new ISVNDiffStatusHandler() {
 //            public void handleDiffStatus(SVNDiffStatus svnDiffStatus) throws VCSException {
 //                System.out.println(svnDiffStatus.getModificationType() + " " + svnDiffStatus.getPath());

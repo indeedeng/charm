@@ -1,10 +1,4 @@
-package com.indeed.charm; /**
- * Created by IntelliJ IDEA.
- * User: jackh
- * Date: Jun 30, 2010
- * Time: 11:41:05 AM
- * To change this template use File | Settings | File Templates.
- */
+package com.indeed.charm;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
@@ -18,11 +12,12 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 
-import com.indeed.charm.ReleaseEnvironment;
 import com.indeed.charm.svn.SubversionClient;
-import com.indeed.charm.ProjectsLoader;
-import com.indeed.charm.actions.BranchJobManager;
+import com.indeed.charm.actions.BackgroundJobManager;
+import com.google.common.collect.MapMaker;
 
+/**
+ */
 public class ContextListener implements ServletContextListener,
         HttpSessionListener, HttpSessionAttributeListener {
 
@@ -48,8 +43,9 @@ public class ContextListener implements ServletContextListener,
             ctx.setAttribute(VCSClient.class.getSimpleName(), svnClient);
             final ProjectsLoader projectsLoader = new ProjectsLoader(env, svnClient);
             ctx.setAttribute(ProjectsLoader.class.getSimpleName(), projectsLoader);
-            final BranchJobManager branchJobManager = new BranchJobManager();
-            ctx.setAttribute(BranchJobManager.class.getSimpleName(), branchJobManager);
+            final BackgroundJobManager backgroundJobManager = new BackgroundJobManager();
+            ctx.setAttribute(BackgroundJobManager.class.getSimpleName(), backgroundJobManager);
+            ctx.setAttribute("DepGraphCache", new MapMaker().softValues().makeMap());
         } catch (VCSException e) {
             log.error("Unable to initialize subversion", e);
         }

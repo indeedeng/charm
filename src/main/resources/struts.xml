@@ -54,5 +54,15 @@
         <action name="checkForTrunkDiffs" class="com.indeed.charm.actions.CheckForTrunkDiffsAjaxAction">
             <result type="json"/>
         </action>
+        <action name="listDependencyConflicts" class="com.indeed.charm.actions.ListDependencyConflictsAction">
+            <result>/show-conflicts.jsp</result>
+        </action>
+        <action name="checkUpgradeConflicts" class="com.indeed.charm.actions.CheckUpgradeDependencyConflictsAction">
+            <result>/show-conflicts.jsp</result>
+        </action>
+        <action name="upgradeIvyDep" class="com.indeed.charm.actions.UpgradeBranchIvyDependencyAction">
+            <result name="login">/upgrade-login.jsp</result>
+            <result>/show-job.jsp</result>
+        </action>
     </package>
 </struts>

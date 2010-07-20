@@ -4,13 +4,13 @@ import com.opensymphony.xwork2.ActionSupport;
 import com.indeed.charm.ProjectsLoader;
 import com.indeed.charm.VCSClient;
 import com.indeed.charm.ReleaseEnvironment;
-import com.indeed.charm.LinkifyPattern;
+import com.indeed.charm.ivy.IvyLoader;
 
 import javax.servlet.ServletContext;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import org.apache.struts2.util.ServletContextAware;
+
+import java.util.Map;
 
 /**
  */
@@ -18,7 +18,8 @@ public abstract class VCSActionSupport extends ActionSupport implements ServletC
     protected ReleaseEnvironment env;
     protected VCSClient vcsClient;
     protected ProjectsLoader projectsLoader;
-    protected BranchJobManager branchJobManager;
+    protected BackgroundJobManager backgroundJobManager;
+    protected Map<String, IvyLoader.DepGraph> depGraphCache;
 
     protected String project;
 
@@ -26,7 +27,8 @@ public abstract class VCSActionSupport extends ActionSupport implements ServletC
         env = (ReleaseEnvironment) servletContext.getAttribute(ReleaseEnvironment.class.getSimpleName());
         vcsClient = (VCSClient) servletContext.getAttribute(VCSClient.class.getSimpleName());
         projectsLoader = (ProjectsLoader) servletContext.getAttribute(ProjectsLoader.class.getSimpleName());
-        branchJobManager = (BranchJobManager) servletContext.getAttribute(BranchJobManager.class.getSimpleName());
+        backgroundJobManager = (BackgroundJobManager) servletContext.getAttribute(BackgroundJobManager.class.getSimpleName());
+        depGraphCache = (Map<String, IvyLoader.DepGraph>) servletContext.getAttribute("DepGraphCache");
     }
 
     public String getProject() {

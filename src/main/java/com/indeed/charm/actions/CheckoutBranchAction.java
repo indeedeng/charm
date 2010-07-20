@@ -17,17 +17,21 @@ public class CheckoutBranchAction extends BaseBranchAction {
     private String user;
     private String password;
     private Long revision;
-    private BranchJob job;
+    private BackgroundJob<Boolean> job;
 
     @Override
     public String execute() throws Exception {
         if (jobId != null) {
-            job = branchJobManager.getJobForId(jobId);
-            return job != null ? SUCCESS : ERROR;
+            job = backgroundJobManager.getJobForId(jobId);
+            if (job != null) {
+                return SUCCESS;
+            } else {
+                jobId = null;
+            }
         }
         final File branchDir = env.getBranchWorkingDirectory(project, branchDate, user);
         final VCSClient vcsClient = env.newClient(env, user, password);
-        final BranchJob job = new BranchJob() {
+        final BackgroundJob<Boolean> job = new BackgroundJob<Boolean>() {
             public Boolean call() throws Exception {
                 try {
                     log("Working Dir: " + branchDir);
@@ -47,7 +51,7 @@ public class CheckoutBranchAction extends BaseBranchAction {
                 return false;
             }
 
-            protected String getTitle() {
+            public String getTitle() {
                 return "Checkout " + project + " Branch " + branchDate;
             }
 
@@ -57,7 +61,7 @@ public class CheckoutBranchAction extends BaseBranchAction {
                 log.info(message);
             }
         };
-        branchJobManager.submit(job);
+        backgroundJobManager.submit(job);
         setJob(job);
         return SUCCESS;
     }
@@ -70,11 +74,11 @@ public class CheckoutBranchAction extends BaseBranchAction {
         this.revision = revision;
     }
 
-    public BranchJob getJob() {
+    public BackgroundJob<Boolean> getJob() {
         return job;
     }
 
-    public void setJob(BranchJob job) {
+    public void setJob(BackgroundJob<Boolean> job) {
         this.job = job;
     }
 
