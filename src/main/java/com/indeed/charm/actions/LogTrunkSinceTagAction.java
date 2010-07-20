@@ -55,7 +55,7 @@ public class LogTrunkSinceTagAction extends VCSActionSupport {
     public String execute() throws Exception {
         try {
             if (tag == null) {
-                tag = vcsClient.listTags(project, 1, VCSClient.Ordering.REVERSE_AGE).get(0);
+                tag = vcsClient.listTags(project, 1, VCSClient.Ordering.REVERSE_AGE).get(0).getName();
             }
             if (path == null) {
                 path = ".";

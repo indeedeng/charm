@@ -21,6 +21,8 @@ import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
 import com.indeed.charm.model.LogEntry;
 import com.indeed.charm.model.CommitInfo;
+import com.indeed.charm.model.DiffStatus;
+import com.indeed.charm.model.DirEntry;
 import com.indeed.charm.actions.LogEntryVisitor;
 import com.indeed.charm.actions.DiffStatusVisitor;
 
@@ -92,6 +94,20 @@ public class SubversionClient implements VCSClient {
         }
     }
 
+    public boolean hasTrunkCommitsSinceTag(String project, String tag) throws VCSException {
+        final boolean[] trunkDiff = new boolean[1];
+        visitTagToTrunkDiffStatus(new DiffStatusVisitor() {
+            public boolean visit(DiffStatus diffStatus) {
+                if (!"none".equals(diffStatus.getModificationType())) {
+                    trunkDiff[0] = true;
+                    return false;
+                }
+                return true;
+            }
+        }, project, tag);
+        return trunkDiff[0];
+    }
+
     public void visitTagToTagDiffStatus(DiffStatusVisitor visitor, String project, String tag1, String tag2) throws VCSException {
         try {
             SVNDiffClient differ = new SVNDiffClient(authManager, null);
@@ -124,6 +140,20 @@ public class SubversionClient implements VCSClient {
                 throw new VCSException(e);
             }
         }
+    }
+
+    public boolean hasTrunkCommitsSinceBranch(String project, String branchDate) throws VCSException {
+        final boolean[] trunkDiff = new boolean[1];
+        visitBranchToTrunkDiffStatus(new DiffStatusVisitor() {
+            public boolean visit(DiffStatus diffStatus) {
+                if (!"none".equals(diffStatus.getModificationType())) {
+                    trunkDiff[0] = true;
+                    return false;
+                }
+                return true;
+            }
+        }, project, branchDate);
+        return trunkDiff[0];
     }
 
     public void visitTagDiffStatus(DiffStatusVisitor visitor, String project, String version1, String version2) throws VCSException {
@@ -252,14 +282,14 @@ public class SubversionClient implements VCSClient {
         orderings.put(Ordering.REVERSE_AGE, REVERSE_AGE_COMPARATOR);
     }
 
-    public List<String> listBranches(String project, int limit, Ordering ordering) throws VCSException {
+    public List<DirEntry> listBranches(String project, int limit, Ordering ordering) throws VCSException {
         try {
             final TreeSet<SVNDirEntry> branches = Sets.newTreeSet(orderings.get(ordering));
             repo.getDir(project + env.getBranchPath(), -1, null, branches);
             Iterator<SVNDirEntry> branchesIter = branches.iterator();
-            List<String> ret = Lists.newArrayListWithExpectedSize(limit);
+            List<DirEntry> ret = Lists.newArrayListWithExpectedSize(limit);
             for (int i = 0; i < limit && branchesIter.hasNext(); i++) {
-                ret.add(branchesIter.next().getName());
+                ret.add(new SVNDirEntryWrapper(branchesIter.next()));
             }
             return ret;
         } catch (SVNException e) {
@@ -267,14 +297,14 @@ public class SubversionClient implements VCSClient {
         }
     }
 
-    public List<String> listTags(String project, int limit, Ordering ordering) throws VCSException {
+    public List<DirEntry> listTags(String project, int limit, Ordering ordering) throws VCSException {
         try {
             final TreeSet<SVNDirEntry> tags = Sets.newTreeSet(orderings.get(ordering));
             repo.getDir(project + env.getTagPath(), -1, null, tags);
             Iterator<SVNDirEntry> tagsIter = tags.iterator();
-            List<String> ret = Lists.newArrayListWithExpectedSize(limit);
+            List<DirEntry> ret = Lists.newArrayListWithExpectedSize(limit);
             for (int i = 0; i < limit && tagsIter.hasNext(); i++) {
-                ret.add(tagsIter.next().getName());
+                ret.add(new SVNDirEntryWrapper(tagsIter.next()));
             }
             return ret;
         } catch (SVNException e) {
@@ -282,13 +312,13 @@ public class SubversionClient implements VCSClient {
         }
     }
 
-    public List<String> listDir(String dir, Ordering ordering) throws VCSException {
+    public List<DirEntry> listDir(String dir, Ordering ordering) throws VCSException {
         try {
             final TreeSet<SVNDirEntry> entries = Sets.newTreeSet(orderings.get(ordering));
             repo.getDir(dir, -1, null, entries);
-            List<String> ret = Lists.newArrayListWithExpectedSize(entries.size());
+            List<DirEntry> ret = Lists.newArrayListWithExpectedSize(entries.size());
             for (SVNDirEntry entry : entries) {
-                ret.add(entry.getName());
+                ret.add(new SVNDirEntryWrapper(entry));
             }
             return ret;
         } catch (SVNException e) {
@@ -318,21 +348,6 @@ public class SubversionClient implements VCSClient {
         try {
             SVNNodeKind kind = repo.checkPath(path, repo.getLatestRevision());
             return kind != SVNNodeKind.NONE;
-        } catch (SVNException e) {
-            throw new VCSException(e);
-        }
-    }
-
-    public List<String> getTags(String project, int limit, Ordering ordering) throws VCSException {
-        try {
-            final TreeSet<SVNDirEntry> tags = Sets.newTreeSet(orderings.get(ordering));
-            repo.getDir(project + env.getTagPath(), -1, null, tags);
-            Iterator<SVNDirEntry> tagsIter = tags.iterator();
-            List<String> ret = Lists.newArrayListWithExpectedSize(limit);
-            for (int i = 0; i < limit && tagsIter.hasNext(); i++) {
-                ret.add(tagsIter.next().getName());
-            }
-            return ret;
         } catch (SVNException e) {
             throw new VCSException(e);
         }

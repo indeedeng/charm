@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList;
 import com.indeed.charm.model.Project;
+import com.indeed.charm.model.DirEntry;
 
 import java.util.concurrent.*;
 import java.util.TreeSet;
@@ -64,8 +65,8 @@ public class ProjectsLoader implements Runnable {
             if (root.length() > 0 && !root.endsWith("/")) {
                 root = root + "/";
             }
-            for (String name : vcsClient.listDir(root, VCSClient.Ordering.NORMAL)) {
-                names.add(root + name);
+            for (DirEntry entry : vcsClient.listDir(root, VCSClient.Ordering.NORMAL)) {
+                names.add(root + entry.getName());
             }
         }
         List<Project> rels = Lists.newArrayListWithCapacity(names.size());

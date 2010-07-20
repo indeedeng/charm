@@ -23,7 +23,7 @@ public class DiffTagToTrunkAction extends VCSActionSupport {
     public String execute() throws Exception {
         try {
             if (getTag() == null) {
-                setTag(vcsClient.listTags(project, 1, VCSClient.Ordering.REVERSE_AGE).get(0));
+                setTag(vcsClient.listTags(project, 1, VCSClient.Ordering.REVERSE_AGE).get(0).getName());
             }
             final TreeMap<String, DiffStatus> tmp = Maps.newTreeMap();
             vcsClient.visitTagToTrunkDiffStatus(new DiffStatusVisitor() {

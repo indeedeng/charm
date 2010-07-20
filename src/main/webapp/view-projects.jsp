@@ -17,14 +17,14 @@
         <s:url var="branchesUrl" action="listBranches">
             <s:param name="project" value="#project.name"/>
         </s:url>
-        <s:url var="diffBranchToTrunkUrl" action="diffBranchToTrunk">
+        <s:url var="logTrunkSinceBranchUrl" action="logTrunkSinceBranch">
             <s:param name="project" value="#project.name"/>
         </s:url>
         <s:if test="publishedTags">
             <s:url var="tagsUrl" action="listTags">
                 <s:param name="project" value="#project.name"/>
             </s:url>
-            <s:url var="diffTagToTrunkUrl" action="diffTagToTrunk">
+            <s:url var="logTrunkSinceTagUrl" action="logTrunkSinceTag">
                 <s:param name="project" value="#project.name"/>
             </s:url>
         </s:if>
@@ -34,10 +34,10 @@
                 <td><s:a href="%{depsUrl}">dependencies</s:a></td>
             </s:if>
             <td><s:a href="%{branchesUrl}">branches</s:a></td>
-            <td><s:a href="%{diffBranchToTrunkUrl}">latest branch vs. trunk</s:a></td>
+            <td><s:a href="%{logTrunkSinceBranchUrl}">changes since branch</s:a></td>
             <s:if test="publishedTags">
                 <td><s:a href="%{tagsUrl}">tags</s:a></td>
-                <td><s:a href="%{diffTagToTrunkUrl}">latest tag vs. trunk</s:a></td>
+                <td><s:a href="%{logTrunkSinceTagUrl}">changes since tag</s:a></td>
             </s:if>
             <s:else><td>&nbsp;</td><td>&nbsp;</td></s:else>
         </tr>
@@ -54,7 +54,7 @@
         <s:url var="tagsUrl" action="listTags">
             <s:param name="project" value="#project.name"/>
         </s:url>
-        <s:url var="diffTagToTrunkUrl" action="diffTagToTrunk">
+        <s:url var="logTrunkSinceTagUrl" action="logTrunkSinceTag">
             <s:param name="project" value="#project.name"/>
         </s:url>
         <tr>
@@ -63,7 +63,7 @@
                 <td><s:a href="%{depsUrl}">dependencies</s:a></td>
             </s:if>
             <td><s:a href="%{tagsUrl}">tags</s:a></td>
-            <td><s:a href="%{diffTagToTrunkUrl}">latest tag vs. trunk</s:a></td>
+            <td><s:a href="%{logTrunkSinceTagUrl}">changes since tag</s:a></td>
         </tr>
     </s:iterator>
 </table>

@@ -17,7 +17,7 @@ public class LogBranchAction extends BaseBranchLogAction {
     public String execute() throws Exception {
         try {
             if (getBranchDate() == null) {
-                setBranchDate(vcsClient.listBranches(project, 1, VCSClient.Ordering.REVERSE_BRANCH).get(0));
+                setBranchDate(vcsClient.listBranches(project, 1, VCSClient.Ordering.REVERSE_BRANCH).get(0).getName());
             }
             if (getPath() == null) {
                 setPath(".");

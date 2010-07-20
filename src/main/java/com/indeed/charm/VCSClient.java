@@ -4,6 +4,7 @@ import com.indeed.charm.actions.LogEntryVisitor;
 import com.indeed.charm.actions.DiffStatusVisitor;
 import com.indeed.charm.model.LogEntry;
 import com.indeed.charm.model.CommitInfo;
+import com.indeed.charm.model.DirEntry;
 
 import java.util.List;
 import java.util.Date;
@@ -25,9 +26,13 @@ public interface VCSClient {
 
     void visitTagToTrunkDiffStatus(DiffStatusVisitor visitor, String project, String tag) throws VCSException;
 
+    boolean hasTrunkCommitsSinceTag(String project, String tag) throws VCSException;
+
     void visitTagToTagDiffStatus(DiffStatusVisitor visitor, String project, String tag1, String tag2) throws VCSException;
 
     void visitBranchToTrunkDiffStatus(DiffStatusVisitor visitor, String project, String branchDate) throws VCSException;
+
+    boolean hasTrunkCommitsSinceBranch(String project, String branchDate) throws VCSException;
 
     void visitTagDiffStatus(DiffStatusVisitor visitor, String project, String version1, String version2) throws VCSException;
 
@@ -45,17 +50,15 @@ public interface VCSClient {
 
     void visitTrunkChangeLogSinceTag(LogEntryVisitor visitor, String project, String tag, int limit, String... paths) throws VCSException;
 
-    List<String> listBranches(String project, int limit, Ordering ordering) throws VCSException;
+    List<DirEntry> listBranches(String project, int limit, Ordering ordering) throws VCSException;
 
-    List<String> listTags(String project, int limit, Ordering ordering) throws VCSException;
+    List<DirEntry> listTags(String project, int limit, Ordering ordering) throws VCSException;
 
-    List<String> listDir(String dir, Ordering ordering) throws VCSException;
+    List<DirEntry> listDir(String dir, Ordering ordering) throws VCSException;
 
     boolean hasFilesSince(String path, Date earliest);
 
     boolean checkExistsInHead(String path) throws VCSException;
-
-    List<String> getTags(String project, int limit, Ordering ordering) throws VCSException;
 
     long checkoutBranch(String project, String branchDate, File workingDir) throws VCSException, IOException;
 

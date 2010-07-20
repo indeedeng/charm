@@ -8,25 +8,22 @@
 <body>
 <h2><s:property value="project"/> tags</h2>
 <s:if test="trunkDifferent">
-    <s:url var="trunkDiffUrl" action="diffTagToTrunk">
+    <s:url var="trunkSinceTagUrl" action="logTrunkSinceTag">
         <s:param name="project" value="project"/>
     </s:url>
-    <div class="message">trunk has <s:a href="%{trunkDiffUrl}">differences from latest tag</s:a></div>
+    <div class="message">trunk has <s:a href="%{trunkSinceTagUrl}">changes since latest tag</s:a></div>
 </s:if>
 <table>
 <s:iterator value="tags" var="tag">
-    <s:url var="trunkDiffUrl" action="diffTagToTrunk">
+    <s:url var="trunkSinceTagUrl" action="logTrunkSinceTag">
         <s:param name="project" value="project"/>
-        <s:param name="tag" value="tag"/>
-    </s:url>
-    <s:url var="logTrunkUrl" action="logTrunkSinceTag">
-        <s:param name="project" value="project"/>
-        <s:param name="tag" value="tag"/>
+        <s:param name="tag" value="name"/>
     </s:url>
     <tr>
-        <td><s:property/></td>
-        <td><s:a href="%{trunkDiffUrl}">diff trunk</s:a></td>
-        <td><s:a href="%{logTrunkUrl}">changes on trunk</s:a></td>
+        <td><s:property value="name"/></td>
+        <td><s:property value="author"/></td>
+        <td><s:property value="date"/></td>
+        <td><s:a href="%{trunkSinceTagUrl}">changes on trunk</s:a></td></td>
     </tr>
 </s:iterator>
 </table>

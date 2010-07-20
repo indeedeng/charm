@@ -95,7 +95,7 @@ public class IvyLoader {
 
     protected String getLatestRev(String path) {
         try {
-            return vcsClient.listTags(path, 1, VCSClient.Ordering.REVERSE_AGE).get(0);
+            return vcsClient.listTags(path, 1, VCSClient.Ordering.REVERSE_AGE).get(0).getName();
         } catch (VCSException e) {
             log.error("Can't get latest rev for " + path, e);
         }
@@ -129,7 +129,7 @@ public class IvyLoader {
         } catch (ParserConfigurationException e) {
             log.error("failed to parse ivy xml", e);
         } catch (VCSException e) {
-            log.error("failed to load ivy xml", e);
+            log.warn("failed to load ivy xml: " + e.getMessage());
         } catch (SAXException e) {
             log.error("failed to parse ivy xml", e);
         } catch (IOException e) {
