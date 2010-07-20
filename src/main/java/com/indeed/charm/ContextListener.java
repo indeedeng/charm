@@ -7,6 +7,8 @@ package com.indeed.charm; /**
  */
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -34,6 +36,9 @@ public class ContextListener implements ServletContextListener,
     // ServletContextListener implementation
     // -------------------------------------------------------
     public void contextInitialized(ServletContextEvent sce) {
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.WARN);
+        Logger.getLogger("com.indeed.charm").setLevel(Level.INFO);
         try {
             final ServletContext ctx = sce.getServletContext();
             final ReleaseEnvironment env = new ReleaseEnvironment();
