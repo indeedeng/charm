@@ -5,5 +5,5 @@ import com.indeed.charm.model.DiffStatus;
 /**
  */
 public interface DiffStatusVisitor {
-    void visit(DiffStatus diffStatus);
+    boolean visit(DiffStatus diffStatus);
 }

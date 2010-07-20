@@ -9,12 +9,14 @@ import java.util.List;
 import java.util.Date;
 import java.io.File;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 
 /**
  */
 public interface VCSClient {
     public enum Ordering {
         NORMAL,
+        REVERSE_AGE,
         REVERSE_VERSION,
         REVERSE_BRANCH
     }
@@ -22,6 +24,8 @@ public interface VCSClient {
     void visitBranchDiffStatus(DiffStatusVisitor visitor, String project, String date1, String date2) throws VCSException;
 
     void visitTagToTrunkDiffStatus(DiffStatusVisitor visitor, String project, String tag) throws VCSException;
+
+    void visitTagToTagDiffStatus(DiffStatusVisitor visitor, String project, String tag1, String tag2) throws VCSException;
 
     void visitBranchToTrunkDiffStatus(DiffStatusVisitor visitor, String project, String branchDate) throws VCSException;
 
@@ -60,4 +64,7 @@ public interface VCSClient {
     LogEntry getTrunkLogEntry(String project, long revision) throws VCSException;
 
     LogEntry getBranchLogEntry(String project, String branchDate, long revision) throws VCSException;
+
+    void getFile(String path, long revision, ByteArrayOutputStream outputStream) throws VCSException;
+
 }

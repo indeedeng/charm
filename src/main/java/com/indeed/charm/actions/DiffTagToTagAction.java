@@ -7,33 +7,30 @@ import java.util.TreeMap;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.ImmutableList;
-import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
 import com.indeed.charm.model.DiffStatus;
 
 /**
  */
-public class DiffTagToTrunkAction extends VCSActionSupport {
-    private static final Logger log = Logger.getLogger(DiffTagToTrunkAction.class);
+public class DiffTagToTagAction extends VCSActionSupport {
+    private static final Logger log = Logger.getLogger(DiffTagToTagAction.class);
 
-    private String tag;
+    private String tag1;
+    private String tag2;
     private List<DiffStatus> diffs;
 
     @Override
     public String execute() throws Exception {
         try {
-            if (getTag() == null) {
-                setTag(vcsClient.listTags(project, 1, VCSClient.Ordering.REVERSE_AGE).get(0));
-            }
             final TreeMap<String, DiffStatus> tmp = Maps.newTreeMap();
-            vcsClient.visitTagToTrunkDiffStatus(new DiffStatusVisitor() {
+            vcsClient.visitTagToTagDiffStatus(new DiffStatusVisitor() {
                         public boolean visit(DiffStatus diffStatus) {
                             if (!"none".equals(diffStatus.getModificationType())) {
                                 tmp.put(diffStatus.getPath(), diffStatus);
                             }
                             return true;
                         }
-                    }, getProject(), getTag());
+                    }, getProject(), getTag1(), getTag2());
             setDiffs(ImmutableList.copyOf(tmp.values()));
         } catch (VCSException e) {
             log.error("Failed to find tag to trunk diffs", e);
@@ -42,12 +39,20 @@ public class DiffTagToTrunkAction extends VCSActionSupport {
         return SUCCESS;
     }
 
-    public String getTag() {
-        return tag;
+    public String getTag1() {
+        return tag1;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setTag1(String tag) {
+        this.tag1 = tag;
+    }
+
+    public String getTag2() {
+        return tag2;
+    }
+
+    public void setTag2(String tag) {
+        this.tag2 = tag;
     }
 
     public List<DiffStatus> getDiffs() {
@@ -59,14 +64,14 @@ public class DiffTagToTrunkAction extends VCSActionSupport {
     }
 
     public String getPath1() {
-        return project + env.getTagPath() + tag;
+        return project + env.getTagPath() + tag1;
     }
 
     public String getPath2() {
-        return project + env.getTrunkPath();
+        return project + env.getTagPath() + tag2;
     }
 
     public boolean isIncludeTrunkSinceTag() {
-        return true;
+        return false;
     }
 }

@@ -9,6 +9,12 @@
 <h2><s:property value="project"/> branches</h2>
 <table>
 <s:iterator value="branches" var="branchDate">
+    <s:if test="%{ivyEnabled}">
+        <s:url var="depsUrl" action="showIvyDeps">
+            <s:param name="project" value="project"/>
+            <s:param name="branchDate" value="branchDate"/>
+        </s:url>
+    </s:if>
     <s:url var="branchLogUrl" action="logBranch">
         <s:param name="project" value="project"/>
         <s:param name="branchDate" value="branchDate"/>
@@ -23,6 +29,9 @@
     </s:url>
     <tr>
         <td><s:property/></td>
+        <s:if test="%{ivyEnabled}">
+            <td><s:a href="%{depsUrl}">dependencies</s:a></td>
+        </s:if>
         <td><s:a href="%{branchLogUrl}">branch log</s:a></td>
         <td><s:a href="%{trunkDiffUrl}">diff trunk</s:a></td>
         <td><s:a href="%{logTrunkUrl}">changes on trunk</s:a></td>

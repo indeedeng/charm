@@ -57,7 +57,7 @@
         <td><s:property value="path"/></td>
         <s:if test='%{branchDate != null}'>
             <td><s:a href="%{branchLogUrl}">branch log</s:a></td>
-            <td><s:a href="%{trunkToBranchLogUrl}">changes on trunk</s:a></td>
+            <td><s:a href="%{trunkToBranchUrl}">changes on trunk</s:a></td>
         </s:if>
         <s:if test='%{tag != null}'>
             <td><s:a href="%{trunkToTagLogUrl}">changes on trunk</s:a></td>
@@ -70,11 +70,11 @@
         <s:param name="project" value="project"/>
     </s:url>
 </s:if>
-<s:elseif test="%{tag != null}">
+<s:else>
     <s:url var="projectUrl" action="listTags">
         <s:param name="project" value="project"/>
     </s:url>
-</s:elseif>
+</s:else>
 <p><s:a href="%{projectUrl}"><s:property value="project"/></s:a></p>
 <p></p><a href="/charm/">CHARM Home</a></p>
 </body>

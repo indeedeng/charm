@@ -17,6 +17,9 @@
         <action name="diffTagToTrunk" class="com.indeed.charm.actions.DiffTagToTrunkAction">
             <result>/view-diffs.jsp</result>
         </action>
+        <action name="diffTagToTag" class="com.indeed.charm.actions.DiffTagToTagAction">
+            <result>/view-diffs.jsp</result>
+        </action>
         <action name="logTrunkSinceBranch" class="com.indeed.charm.actions.LogTrunkSinceBranchAction">
             <result>/view-log.jsp</result>
         </action>
@@ -44,6 +47,9 @@
         </action>
         <action name="cleanupBranchWC" class="com.indeed.charm.actions.CleanupBranchWCAction">
             <result type="redirect">listBranches?project=${project}</result>
+        </action>
+        <action name="showIvyDeps" class="com.indeed.charm.actions.ShowIvyDependenciesAction">
+            <result>/view-deps.jsp</result>
         </action>
     </package>
 </struts>

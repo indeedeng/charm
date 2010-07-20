@@ -24,10 +24,11 @@ public class DiffBranchesAction extends VCSActionSupport {
             final List<DiffStatus> tmp = Lists.newArrayList();
             vcsClient.visitBranchDiffStatus(
                     new DiffStatusVisitor() {
-                        public void visit(DiffStatus diffStatus) {
+                        public boolean visit(DiffStatus diffStatus) {
                             if (!"none".equals(diffStatus.getModificationType())) {
                                 tmp.add(diffStatus);
                             }
+                            return true;
                         }
                     }, getProject(), getBranchDate1(), getBranchDate2());
             setDiffs(ImmutableList.copyOf(tmp));

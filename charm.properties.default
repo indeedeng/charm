@@ -41,3 +41,12 @@ release.history.maxdays=365
 #linkify.replacement.JIRA=<a target="_blank" href="https://bugs.example.com/browse/$1">$0</a>
 #linkify.pattern.FISHEYE=(\\br([1-9]\\d*)\\b)
 #linkify.replacement.FISHEYE=<a target="_blank" href="https://fisheye.example.com/changelog/MainRepo/?cs=$2">$1</a>
+
+# Home organization for Ivy dependencies. Enables Ivy support when set.
+#ivy.org=mycompany
+
+# Name of file at root of each project containing ivy dependency list
+ivy.filename=ivy.xml
+
+# If using properties for revisions in ivy.xml files, path to properties file used to resolve those
+#ivy.properties=config/ivy/libraries.properties

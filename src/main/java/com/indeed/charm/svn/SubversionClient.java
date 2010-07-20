@@ -11,11 +11,11 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import java.util.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
-import com.google.common.base.Splitter;
 import com.indeed.charm.ReleaseEnvironment;
 import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
@@ -69,7 +69,9 @@ public class SubversionClient implements VCSClient {
                     false,
                     new SVNDiffStatusVisitor(visitor));
         } catch (SVNException e) {
-            throw new VCSException(e);
+            if (e.getErrorMessage().getErrorCode() != SVNErrorCode.CANCELLED) {
+                throw new VCSException(e);
+            }
         }
     }
 
@@ -84,7 +86,26 @@ public class SubversionClient implements VCSClient {
                     false,
                     new SVNDiffStatusVisitor(visitor));
         } catch (SVNException e) {
-            throw new VCSException(e);
+            if (e.getErrorMessage().getErrorCode() != SVNErrorCode.CANCELLED) {
+                throw new VCSException(e);
+            }
+        }
+    }
+
+    public void visitTagToTagDiffStatus(DiffStatusVisitor visitor, String project, String tag1, String tag2) throws VCSException {
+        try {
+            SVNDiffClient differ = new SVNDiffClient(authManager, null);
+            differ.doDiffStatus(SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getTagPath() + tag1),
+                    SVNRevision.HEAD,
+                    SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getTagPath() + tag2),
+                    SVNRevision.HEAD,
+                    SVNDepth.INFINITY,
+                    false,
+                    new SVNDiffStatusVisitor(visitor));
+        } catch (SVNException e) {
+            if (e.getErrorMessage().getErrorCode() != SVNErrorCode.CANCELLED) {
+                throw new VCSException(e);
+            }
         }
     }
 
@@ -99,7 +120,9 @@ public class SubversionClient implements VCSClient {
                     false,
                     new SVNDiffStatusVisitor(visitor));
         } catch (SVNException e) {
-            throw new VCSException(e);
+            if (e.getErrorMessage().getErrorCode() != SVNErrorCode.CANCELLED) {
+                throw new VCSException(e);
+            }
         }
     }
 
@@ -114,7 +137,9 @@ public class SubversionClient implements VCSClient {
                     false,
                     new SVNDiffStatusVisitor(visitor));
         } catch (SVNException e) {
-            throw new VCSException(e);
+            if (e.getErrorMessage().getErrorCode() != SVNErrorCode.CANCELLED) {
+                throw new VCSException(e);
+            }
         }
     }
 
@@ -193,22 +218,18 @@ public class SubversionClient implements VCSClient {
         }
     }
 
-    private static Splitter versionSplitter = Splitter.on(".");
-
-    private static String normalizeVersion(String in, int width) {
-        final String format = "%" + width + "s";
-        StringBuilder builder = new StringBuilder();
-        for (String v : versionSplitter.split(in)) {
-            builder.append(String.format(format, v)).append(".");
-        }
-        return builder.toString();
-    }
+    private static Comparator<? super SVNDirEntry> REVERSE_AGE_COMPARATOR =
+            new Comparator<SVNDirEntry>() {
+                public int compare(SVNDirEntry v1, SVNDirEntry v2) {
+                    return v2.getDate().compareTo(v1.getDate());
+                }
+            };
 
     private static Comparator<? super SVNDirEntry> REVERSE_VERSION_COMPARATOR =
             new Comparator<SVNDirEntry>() {
                 public int compare(SVNDirEntry v1, SVNDirEntry v2) {
-                    String s1 = normalizeVersion(v1.getName(), 4);
-                    String s2 = normalizeVersion(v2.getName(), 4);
+                    String s1 = ReleaseEnvironment.normalizeVersion(v1.getName(), 4);
+                    String s2 = ReleaseEnvironment.normalizeVersion(v2.getName(), 4);
                     return s2.compareTo(s1);
                 }
             };
@@ -228,6 +249,7 @@ public class SubversionClient implements VCSClient {
         orderings.put(Ordering.NORMAL, com.google.common.collect.Ordering.natural());
         orderings.put(Ordering.REVERSE_BRANCH, REVERSE_BRANCH_COMPARATOR);
         orderings.put(Ordering.REVERSE_VERSION, REVERSE_VERSION_COMPARATOR);
+        orderings.put(Ordering.REVERSE_AGE, REVERSE_AGE_COMPARATOR);
     }
 
     public List<String> listBranches(String project, int limit, Ordering ordering) throws VCSException {
@@ -383,6 +405,15 @@ public class SubversionClient implements VCSClient {
         } catch (SVNException e) {
             throw new VCSException(e);
         }
+    }
+
+    public void getFile(String path, long revision, ByteArrayOutputStream outputStream) throws VCSException {
+        try {
+            repo.getFile(path, revision, null, outputStream);
+        } catch (SVNException e) {
+            throw new VCSException(e);
+        }
+
     }
 
     public static void main(String[] args) throws Exception {

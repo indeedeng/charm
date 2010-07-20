@@ -21,6 +21,7 @@ public class ReleaseEnvironment {
 
     private Properties properties;
     private List<LinkifyPattern> linkifyPatterns;
+    public static Splitter versionSplitter = Splitter.on(".");
 
     public ReleaseEnvironment() {
         properties = new Properties();
@@ -112,5 +113,30 @@ public class ReleaseEnvironment {
     public VCSClient newClient(ReleaseEnvironment env, String user, String password) throws VCSException {
         // TODO choose VCS type based on charm.properties
         return new SubversionClient(env, user, password);
+    }
+
+    public boolean isIvyEnabled() {
+        return getIvyOrg().trim().length() > 0;
+    }
+    
+    public String getIvyFileName() {
+        return properties.getProperty("ivy.filename", "ivy.xml");
+    }
+
+    public String getIvyProperties() {
+        return properties.getProperty("ivy.properties", "libraries.properties");
+    }
+
+    public String getIvyOrg() {
+        return properties.getProperty("ivy.org", "");
+    }
+
+    public static String normalizeVersion(String in, int width) {
+        final String format = "%" + width + "s";
+        StringBuilder builder = new StringBuilder();
+        for (String v : versionSplitter.split(in)) {
+            builder.append(String.format(format, v)).append(".");
+        }
+        return builder.toString();
     }
 }

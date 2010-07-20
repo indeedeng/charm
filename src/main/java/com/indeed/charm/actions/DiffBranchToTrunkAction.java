@@ -27,10 +27,11 @@ public class DiffBranchToTrunkAction extends VCSActionSupport {
             final TreeMap<String, DiffStatus> tmp = Maps.newTreeMap();
             vcsClient.visitBranchToTrunkDiffStatus(
                     new DiffStatusVisitor() {
-                        public void visit(DiffStatus diffStatus) {
+                        public boolean visit(DiffStatus diffStatus) {
                             if (!"none".equals( diffStatus.getModificationType())) {
                                 tmp.put(diffStatus.getPath(),  diffStatus);
                             }
+                            return true;
                         }
                     }, getProject(), getBranchDate());
             setDiffs(ImmutableList.copyOf(tmp.values()));

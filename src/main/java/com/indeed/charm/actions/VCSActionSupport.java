@@ -36,4 +36,8 @@ public abstract class VCSActionSupport extends ActionSupport implements ServletC
     public void setProject(String project) {
         this.project = project;
     }
+
+    public boolean isIvyEnabled() {
+        return env.isIvyEnabled();
+    }
 }

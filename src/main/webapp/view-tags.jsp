@@ -1,12 +1,18 @@
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <html>
 <head>
-    <title>CHARM SVN PublishedTags</title>
+    <title>CHARM SVN Published Version Tags</title>
     <style type="text/css"><jsp:include page="charm.css"/></style>
     <link rel="shortcut icon" href="/charm/favicon.ico"/>
 </head>
 <body>
 <h2><s:property value="project"/> tags</h2>
+<s:if test="trunkDifferent">
+    <s:url var="trunkDiffUrl" action="diffTagToTrunk">
+        <s:param name="project" value="project"/>
+    </s:url>
+    <div class="message">trunk has <s:a href="%{trunkDiffUrl}">differences from latest tag</s:a></div>
+</s:if>
 <table>
 <s:iterator value="tags" var="tag">
     <s:url var="trunkDiffUrl" action="diffTagToTrunk">
