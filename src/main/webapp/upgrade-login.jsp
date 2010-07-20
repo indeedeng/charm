@@ -20,7 +20,7 @@
     <s:textfield name="module" label="Module" value="%{module}"/>
     <s:textfield name="oldRev" label="From" value="%{oldRev}"/>
     <s:textfield name="newRev" label="To" value="%{newRev}"/>
-    <s:textarea name="messagePrefix" label="Commit Message Prefix" value="%{messagePrefix}"/>
+    <s:textarea name="messagePrefix" label="Commit Message Prefix" value="%{messagePrefix}" rows="5" cols="20"/>
     <s:hidden name="project" value="%{project}"/>
     <s:hidden name="branchDate" value="%{branchDate}"/>
     <s:submit/>
