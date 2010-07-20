@@ -19,6 +19,7 @@ public class SVNLogEntryWrapper implements LogEntry {
     private final String revisionUrlFormat;
     private Collection<LogEntry> branchMergeRevisions;
     private String logMessage;
+    private Collection<String> logMessageMatches;
 
     public SVNLogEntryWrapper(SVNLogEntry entry, String revisionUrlFormat) {
         this.entry = entry;
@@ -64,6 +65,14 @@ public class SVNLogEntryWrapper implements LogEntry {
 
     public void setBranchMergeRevisions(Collection<LogEntry> branchMergeRevisions) {
         this.branchMergeRevisions = branchMergeRevisions;
+    }
+
+    public void setLogMessageMatches(Collection<String> matches) {
+        this.logMessageMatches = matches;
+    }
+
+    public Collection<String> getLogMessageMatches() {
+        return logMessageMatches;
     }
 
     public String toString() {

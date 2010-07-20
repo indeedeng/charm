@@ -12,7 +12,7 @@ import com.indeed.charm.model.CommitInfo;
 /**
  */
 public class MergeToBranchAction extends BaseBranchAction {
-    private static Logger log = Logger.getLogger(CheckoutBranchAction.class);
+    private static Logger log = Logger.getLogger(MergeToBranchAction.class);
 
     private Long jobId;
     private String user;

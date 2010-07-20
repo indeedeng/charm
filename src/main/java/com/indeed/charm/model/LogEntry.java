@@ -17,4 +17,7 @@ public interface LogEntry {
     public void setLogMessage(String logMessage);
     public Collection<LogEntry> getBranchMergeRevisions();
     public void setBranchMergeRevisions(Collection<LogEntry> revisions);
+
+    public void setLogMessageMatches(Collection<String> matches);
+    public Collection<String> getLogMessageMatches();
 }

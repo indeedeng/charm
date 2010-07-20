@@ -40,7 +40,12 @@
         </s:if>
     </tr>
 <s:iterator value="logEntries">
-    <tr>
+    <s:if test="%{warnRevisions.contains(revision)}">
+        <tr style="background-color: #FFFF66">
+    </s:if>
+    <s:else>
+        <tr>
+    </s:else>
         <td style="white-space: nowrap;"><script>document.write(formatDate(<s:property value="date.time"/>))</script></td>
         <td><s:a target="_blank" href="%{revisionUrl}"><s:property value="revision"/></s:a></td>
         <td><s:property value="author"/></td>

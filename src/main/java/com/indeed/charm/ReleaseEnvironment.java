@@ -6,15 +6,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
-import java.util.Properties;
-import java.util.Date;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.*;
 import com.indeed.charm.svn.SubversionClient;
-import com.indeed.charm.ivy.IvyDependency;
 
 /**
  */
@@ -30,10 +26,8 @@ public class ReleaseEnvironment {
         properties = new Properties();
         try {
             InputStream in = new FileInputStream(System.getProperty("charm.properties", ""));
-            if (in != null) {
-                properties.load(in);
-                log.info(properties);
-            }
+            properties.load(in);
+            log.info(properties);
         } catch (IOException e) {
             log.error("Failed to load properties", e);
         }
@@ -86,7 +80,7 @@ public class ReleaseEnvironment {
                 if (name.trim().length() > 0) {
                     final String pattern = properties.getProperty("linkify.pattern." + name);
                     final String replacement = properties.getProperty("linkify.replacement." + name);
-                    builder.add(new LinkifyPattern(pattern, replacement));
+                    builder.add(new LinkifyPattern(name, pattern, replacement));
                 }
             }
             linkifyPatterns = builder.build();
@@ -95,9 +89,15 @@ public class ReleaseEnvironment {
     }
 
 
-    public String linkify(String value) {
+    public String linkify(String value, Collection<String> appliedPatterns) {
         for (LinkifyPattern linkifier : getLinkifyPatterns()) {
-            value = linkifier.apply(value);
+            String newValue = linkifier.apply(value);
+            if (!newValue.equals(value)) {
+                value = newValue;
+                if (appliedPatterns != null) {
+                    appliedPatterns.add(linkifier.getName());
+                }
+            }
         }
         return value;
     }
@@ -164,6 +164,16 @@ public class ReleaseEnvironment {
 
     public String getIvyRepoUrl() {
         return properties.getProperty("ivy.repo.url", "");
+    }
+
+    public Set<String> getTrunkWarnIfMissingPatterns() {
+        String patterns = properties.getProperty("log.trunk.warn-if-missing", "");
+        return Sets.newHashSet(Splitter.on(',').trimResults().split(patterns));
+    }
+
+    public Set<String> getBranchWarnIfMissingPatterns() {
+        String patterns = properties.getProperty("log.branch.warn-if-missing", "");
+        return Sets.newHashSet(Splitter.on(',').trimResults().split(patterns));
     }
 
     public static String normalizeVersion(String in, int width) {

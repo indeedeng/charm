@@ -4,8 +4,10 @@ import com.indeed.charm.model.LogEntry;
 import com.indeed.charm.ReleaseEnvironment;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
 import java.util.TreeMap;
+import java.util.List;
 
 public class DisplayLogVisitor implements LogEntryVisitor {
     private final TreeMap<Long, LogEntry> entries = Maps.newTreeMap(Ordering.natural().reverse());
@@ -16,7 +18,9 @@ public class DisplayLogVisitor implements LogEntryVisitor {
     }
 
     public void visit(LogEntry entry) {
-        entry.setLogMessage(env.linkify(entry.getLogMessage()));
+        List<String> applied = Lists.newArrayList();
+        entry.setLogMessage(env.linkify(entry.getLogMessage(), applied));
+        entry.setLogMessageMatches(applied);
         entries.put(entry.getRevision(), entry);
     }
 

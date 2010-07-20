@@ -9,6 +9,8 @@ import com.indeed.charm.VCSException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Set;
+import java.util.Collection;
 
 /**
  */
@@ -30,7 +32,7 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
             }
 
             loadPossibleMerges();
-            final DisplayLogVisitor logVisitor = new DisplayLogVisitor(env) {
+            final DisplayLogVisitor logVisitor = new WarningLogVisitor(env.getTrunkWarnIfMissingPatterns()) {
                 @Override
                 public void visit(LogEntry entry) {
                     super.visit(entry);
