@@ -277,9 +277,7 @@ public class IvyLoader {
                     List<IvyDependency> ivyDeps = loader.loadDependencies(resolver);
                     deps = Sets.newHashSet();
                     for (IvyDependency dep : ivyDeps) {
-                        if (dep.isHomeOrg()) {
-                            deps.add(new DependencyNode(dep, env));
-                        }
+                        deps.add(new DependencyNode(dep, env));
                     }
                 }
                 final String homeOrg = env.getIvyOrg();
