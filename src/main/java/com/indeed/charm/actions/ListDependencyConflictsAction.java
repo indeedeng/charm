@@ -12,6 +12,7 @@ import com.indeed.charm.ivy.IvyLoader;
 public class ListDependencyConflictsAction extends VCSActionSupport {
     private static Logger log = Logger.getLogger(ListDependencyConflictsAction.class);
 
+    private String format;
     private String branchDate;
     private String tag;
     private String spec;
@@ -30,6 +31,9 @@ public class ListDependencyConflictsAction extends VCSActionSupport {
                     IvyLoader.DepGraph graph = job.getFuture().get();
                     conflictRecords = graph.listAllConflicts();
                     nonConflictRecords = graph.listNonConflicts();
+                    if ("text".equals(format)) {
+                        return "text";
+                    }
                 }
                 return SUCCESS;
             } else {
@@ -87,6 +91,11 @@ public class ListDependencyConflictsAction extends VCSActionSupport {
         };
         backgroundJobManager.submit(job);
         setJob(job);
+        if (!job.isRunning() && job.getFuture().get() != null) {
+            if ("text".equals(format)) {
+                return "text";
+            }
+        }
         return SUCCESS;
     }
 
@@ -104,6 +113,14 @@ public class ListDependencyConflictsAction extends VCSActionSupport {
 
     public void setJobId(long jobId) {
         this.jobId = jobId;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 
     public String getBranchDate() {

@@ -1,6 +1,7 @@
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <s:url var="refreshUrl">
     <s:param name="project" value="project"/>
+    <s:param name="format" value="format"/>
     <s:param name="branchDate" value="branchDate"/>
     <s:param name="tag" value="tag"/>
     <s:param name="module" value="module"/>

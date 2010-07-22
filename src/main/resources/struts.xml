@@ -57,6 +57,11 @@
         <action name="listDependencyConflicts" class="com.indeed.charm.actions.ListDependencyConflictsAction">
             <result>/show-conflicts.jsp</result>
         </action>
+        <action name="listAllDependencies" class="com.indeed.charm.actions.ListDependencyConflictsAction">
+            <param name="format">text</param>
+            <result>/show-conflicts.jsp</result>
+            <result name="text">/list-dependencies-text.jsp</result>
+        </action>
         <action name="checkUpgradeConflicts" class="com.indeed.charm.actions.CheckUpgradeDependencyConflictsAction">
             <result>/show-conflicts.jsp</result>
         </action>
