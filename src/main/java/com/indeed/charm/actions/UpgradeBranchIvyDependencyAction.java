@@ -66,7 +66,7 @@ public class UpgradeBranchIvyDependencyAction extends BaseBranchAction {
                     } else {
                         log("...no changes made...");
                     }
-                    CommitInfo info = vcsClient.commit(ivyFile, messagePrefix + " upgrade " + module + " from " + oldRev + " to " + newRev);
+                    CommitInfo info = vcsClient.commit(ivyFile, messagePrefix + " [upgrade " + module + " from " + oldRev + " to " + newRev + "]");
                     log("Commit complete");
                     log(info.toString());
                     return true;
