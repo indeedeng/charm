@@ -79,11 +79,13 @@ public class IvyLoader {
     }
 
     public static class IvyReleaseResolver implements Supplier<InputStream> {
+        private final String org;
         private final String project;
         private final String tag;
         private final ReleaseEnvironment env;
 
-        public IvyReleaseResolver(String project, String tag, ReleaseEnvironment env) {
+        public IvyReleaseResolver(String org, String project, String tag, ReleaseEnvironment env) {
+            this.org = org;
             this.project = project;
             this.tag = tag;
             this.env = env;
@@ -91,7 +93,7 @@ public class IvyLoader {
 
         public InputStream get() {
             try {
-                URL ivyUrl = new URL(env.getIvyRepoUrl() + env.getIvyOrg() + '/' + project + "/ivy-" + tag + ".xml");
+                URL ivyUrl = new URL(env.getIvyRepoUrl() + org + '/' + project + "/ivy-" + tag + ".xml");
                 URLConnection conn = ivyUrl.openConnection();
                 return conn.getInputStream();
             } catch (IOException e) {
@@ -222,13 +224,14 @@ public class IvyLoader {
         private final Map<DependencyNode, DependencyNode> allDeps;
         private final Multimap<String, DependencyNode> byName;
         private final boolean findLatestRevs;
+        private final boolean traverseThirdParty;
 
-        public DepGraph(VCSClient client, ReleaseEnvironment env, String project, boolean isTag, String branchDateOrTag) {
+        public DepGraph(VCSClient client, ReleaseEnvironment env, String project, boolean isTag, String branchDateOrTag, boolean traverseThirdParty) {
             this.client = client;
             this.env = env;
             if (isTag) {
                 this.root = new DependencyNode(env.getIvyOrg(), project, project, branchDateOrTag);
-                this.rootResolver = new IvyReleaseResolver(project, branchDateOrTag, env);
+                this.rootResolver = new IvyReleaseResolver(env.getIvyOrg(), project, branchDateOrTag, env);
                 this.findLatestRevs = false;
             } else if (branchDateOrTag != null && !"trunk".equals(branchDateOrTag)) {
                 this.root = new DependencyNode(env.getIvyOrg(), project, getPath(env, client, project), branchDateOrTag);
@@ -241,6 +244,7 @@ public class IvyLoader {
             }
             this.allDeps = Maps.newHashMap();
             this.byName = HashMultimap.create();
+            this.traverseThirdParty = traverseThirdParty;
         }
 
         public void build(Appendable status) throws IOException {
@@ -250,7 +254,7 @@ public class IvyLoader {
             loader.setFindLatestRevs(findLatestRevs);
             List<IvyDependency> deps = loader.loadDependencies(rootResolver);
             for (IvyDependency dep : deps) {
-                add(client, env, status, root, new DependencyNode(dep, env), dep.isHomeOrg());
+                add(client, env, status, root, new DependencyNode(dep, env), traverseThirdParty || dep.isHomeOrg());
             }
 
             status.append("\nloaded " + allDeps.size() + " dependencies\n");
@@ -273,7 +277,7 @@ public class IvyLoader {
                     log.info("Loading dependencies for " + libVersion);
                     IvyLoader loader = new IvyLoader(client, env);
                     loader.setFindLatestRevs(findLatestRevs);
-                    IvyReleaseResolver resolver = new IvyReleaseResolver(libVersion.getName(), libVersion.getRev(), env);
+                    IvyReleaseResolver resolver = new IvyReleaseResolver(libVersion.getOrg(), libVersion.getName(), libVersion.getRev(), env);
                     List<IvyDependency> ivyDeps = loader.loadDependencies(resolver);
                     deps = Sets.newHashSet();
                     for (IvyDependency dep : ivyDeps) {
@@ -282,7 +286,7 @@ public class IvyLoader {
                 }
                 final String homeOrg = env.getIvyOrg();
                 for (DependencyNode lv : deps) {
-                    add(client, env, status, libVersion, lv, homeOrg.equals(lv.getOrg()));
+                    add(client, env, status, libVersion, lv, traverseThirdParty || homeOrg.equals(lv.getOrg()));
                 }
             }
         }

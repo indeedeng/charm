@@ -17,7 +17,7 @@ public class ShowIvyDependenciesAction extends VCSActionSupport {
     public String execute() throws Exception {
         final IvyLoader loader = new IvyLoader(vcsClient, env);
         if (tag != null) {
-            final IvyLoader.IvyReleaseResolver resolver = new IvyLoader.IvyReleaseResolver(project, tag, env);
+            final IvyLoader.IvyReleaseResolver resolver = new IvyLoader.IvyReleaseResolver(env.getIvyOrg(), project, tag, env);
             dependencies = loader.loadDependencies(resolver);
         } else if (branchDate != null && !"trunk".equals(branchDate)) {
             final IvyLoader.BranchResolver resolver = new IvyLoader.BranchResolver(project, branchDate, vcsClient, env);

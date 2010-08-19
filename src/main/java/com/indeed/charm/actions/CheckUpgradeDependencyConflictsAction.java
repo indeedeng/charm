@@ -49,7 +49,7 @@ public class CheckUpgradeDependencyConflictsAction extends VCSActionSupport {
                         graph = depGraphCache.get(cacheKey);
                     }
                     if (graph == null) {
-                        graph = new IvyLoader.DepGraph(vcsClient, env, project, false, branchDate);
+                        graph = new IvyLoader.DepGraph(vcsClient, env, project, false, branchDate, false);
                         logBuilder.append("Loading dependencies...");
                         graph.build(logBuilder);
                         depGraphCache.put(cacheKey, graph);

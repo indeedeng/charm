@@ -16,6 +16,7 @@ public class ListDependencyConflictsAction extends VCSActionSupport {
     private String branchDate;
     private String tag;
     private String spec;
+    private boolean traverseThirdParty;
 
     private Long jobId;
     private BackgroundJob<IvyLoader.DepGraph> job;
@@ -65,7 +66,7 @@ public class ListDependencyConflictsAction extends VCSActionSupport {
                         graph = depGraphCache.get(cacheKey);
                     }
                     if (graph == null) {
-                        graph = new IvyLoader.DepGraph(vcsClient, env, project, tag != null, spec);
+                        graph = new IvyLoader.DepGraph(vcsClient, env, project, tag != null, spec, traverseThirdParty);
                         logBuilder.append("Loading dependencies...");
                         graph.build(logBuilder);
                         depGraphCache.put(cacheKey, graph);
@@ -149,5 +150,9 @@ public class ListDependencyConflictsAction extends VCSActionSupport {
 
     public String getHomeOrg() {
         return env.getIvyOrg();
+    }
+
+    public void setTraverseThirdParty(boolean traverseThirdParty) {
+        this.traverseThirdParty = traverseThirdParty;
     }
 }

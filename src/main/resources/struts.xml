@@ -59,6 +59,7 @@
         </action>
         <action name="listAllDependencies" class="com.indeed.charm.actions.ListDependencyConflictsAction">
             <param name="format">text</param>
+            <param name="traverseThirdParty">true</param>
             <result>/show-conflicts.jsp</result>
             <result name="text">/list-dependencies-text.jsp</result>
         </action>
