@@ -1,4 +1,5 @@
 * text=auto !eol
+/COPYING -text
 /charm.properties.default -text
 /pom.xml -text
 src/main/Main.iml -text
