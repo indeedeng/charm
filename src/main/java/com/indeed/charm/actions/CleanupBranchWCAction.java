@@ -22,6 +22,7 @@ package com.indeed.charm.actions;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import com.indeed.charm.ReleaseEnvironment;
 
 /**
  */
@@ -29,21 +30,6 @@ public class CleanupBranchWCAction extends BaseBranchAction {
     private static Logger log = Logger.getLogger(CleanupBranchWCAction.class);
     
     private String user;
-
-    private void del(File dir) {
-        for (File file : dir.listFiles()) {
-            if (!file.isDirectory()) {
-                log.info("delete " + file.getAbsolutePath());
-                file.delete();
-            } else {
-                del(file);
-            }
-        }
-        for (File file : dir.listFiles()) {
-            log.info("delete " + file.getAbsolutePath());
-            file.delete();
-        }
-    }
 
     @Override
     public String execute() throws Exception {
@@ -55,7 +41,7 @@ public class CleanupBranchWCAction extends BaseBranchAction {
 
             public Boolean call() throws Exception {
                 try {
-                    del(branchDir);
+                    ReleaseEnvironment.recursiveDelete(branchDir);
                 } catch (Exception e) {
                     log.error("Failed to clean up working copy " + branchDir, e);
                 }

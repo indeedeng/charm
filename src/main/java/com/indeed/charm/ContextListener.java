@@ -65,6 +65,9 @@ public class ContextListener implements ServletContextListener,
             final BackgroundJobManager backgroundJobManager = new BackgroundJobManager();
             ctx.setAttribute(BackgroundJobManager.class.getSimpleName(), backgroundJobManager);
             ctx.setAttribute("DepGraphCache", new MapMaker().softValues().makeMap());
+
+            env.scheduleCleanupTask();
+
         } catch (VCSException e) {
             log.error("Unable to initialize subversion", e);
         }

@@ -21,11 +21,9 @@ package com.indeed.charm;
 
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.FileInputStream;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.*;
@@ -217,6 +215,24 @@ public class ReleaseEnvironment {
         return Sets.newHashSet(Splitter.on(',').trimResults().split(patterns));
     }
 
+    public int getCleanupIntervalMinutes() {
+        try {
+            final String value = properties.getProperty("tmp.cleanup-interval-minutes", "60");
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 60;
+        }
+    }
+
+    public int getCleanupAgeDays() {
+        try {
+            final String value = properties.getProperty("tmp.cleanup-age-days", "7");
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 7;
+        }
+    }
+
     public static String normalizeVersion(String in, int width) {
         final String format = "%" + width + "s";
         StringBuilder builder = new StringBuilder();
@@ -224,5 +240,51 @@ public class ReleaseEnvironment {
             builder.append(String.format(format, v)).append(".");
         }
         return builder.toString();
+    }
+
+    public static void recursiveDelete(File dir) {
+        for (File file : dir.listFiles()) {
+            if (!file.isDirectory()) {
+                log.info("delete " + file.getAbsolutePath());
+                file.delete();
+            } else {
+                recursiveDelete(file);
+            }
+        }
+        for (File file : dir.listFiles()) {
+            log.info("delete " + file.getAbsolutePath());
+            file.delete();
+        }
+        dir.delete();
+    }
+
+    private class CleanupTask extends TimerTask {
+        private final Pattern branchDirPattern = Pattern.compile("[\\w\\-]+\\-[0-9]+\\-[0-9]+\\-[0-9]+\\-[\\w]+");
+        private final FilenameFilter branchDirNameFilter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return branchDirPattern.matcher(name).matches();
+            }
+        };
+
+        public void run() {
+            final File workingDirectory = getTempDir();
+            for (File dir : workingDirectory.listFiles(branchDirNameFilter)) {
+                if (dir.isDirectory()) {
+                    log.info("Checking age of " + dir);
+                    final long now = System.currentTimeMillis();
+                    final long age = now - dir.lastModified();
+                    if (age > (getCleanupAgeDays() * 24 * 60 * 60 * 1000)) {
+                        log.info("Old enough, deleting " + dir);
+                        recursiveDelete(dir);
+                    }
+                }
+            }
+        }
+    }
+
+    public void scheduleCleanupTask() {
+        final Timer cleanupTimer = new Timer();
+        final long interval =  getCleanupIntervalMinutes() * 60 * 1000;
+        cleanupTimer.scheduleAtFixedRate(new CleanupTask(), 0, interval);
     }
 }

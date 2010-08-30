@@ -5,6 +5,12 @@
 # where to store temporary files (such as working directories for merges)
 tmp.dir=/tmp
 
+# how often (in minutes) to clean up old temporary working directories
+tmp.cleanup-interval-minutes=60
+
+# how long (in days) to keep old temporary working directories
+tmp.cleanup-age-days=7
+
 # Type of VCS repository (default: svn for Subversion)
 repo.type=svn
 
