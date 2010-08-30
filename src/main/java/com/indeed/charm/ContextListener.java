@@ -22,6 +22,8 @@ package com.indeed.charm;
 import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -50,11 +52,27 @@ public class ContextListener implements ServletContextListener,
     // ServletContextListener implementation
     // -------------------------------------------------------
     public void contextInitialized(ServletContextEvent sce) {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.WARN);
-        Logger.getLogger("com.indeed.charm").setLevel(Level.INFO);
+        final ServletContext ctx = sce.getServletContext();
+        String log4jConfig = ctx.getInitParameter("log4jConfigLocation");
+        if (log4jConfig == null) {
+            log4jConfig = System.getProperty("log4jConfigLocation");
+        }
+        if (log4jConfig != null) {
+            DOMConfigurator.configure(log4jConfig);
+            log.info("Configured: " + log4jConfig);
+        } else {
+            // try properties file
+            log4jConfig = ctx.getInitParameter("log4j.configuration");
+            if (log4jConfig != null) {
+                PropertyConfigurator.configure(log4jConfig);
+            } else {
+                BasicConfigurator.configure();
+                Logger.getRootLogger().setLevel(Level.WARN);
+                Logger.getLogger("com.indeed.charm").setLevel(Level.INFO);
+            }
+        }
+
         try {
-            final ServletContext ctx = sce.getServletContext();
             final ReleaseEnvironment env = new ReleaseEnvironment(sce.getServletContext());
             ctx.setAttribute(ReleaseEnvironment.class.getSimpleName(), env);
             // TODO: select VCS client based on charm.properties
