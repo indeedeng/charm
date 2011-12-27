@@ -84,6 +84,8 @@ public class ContextListener implements ServletContextListener,
             ctx.setAttribute(BackgroundJobManager.class.getSimpleName(), backgroundJobManager);
             ctx.setAttribute("DepGraphCache", new MapMaker().softValues().makeMap());
 
+            env.initializeIssueTracker();
+
             env.scheduleCleanupTask();
 
         } catch (VCSException e) {

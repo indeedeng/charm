@@ -1,6 +1,9 @@
 * text=auto !eol
 /COPYING -text
 /charm.properties.default -text
+lib/README -text
+lib/atlassian-ws.jar -text
+lib/common-jira.jar -text
 /pom.xml -text
 src/main/Main.iml -text
 src/main/java/com/indeed/charm/ContextListener.java -text
@@ -23,6 +26,7 @@ src/main/java/com/indeed/charm/actions/DiffStatusVisitor.java -text
 src/main/java/com/indeed/charm/actions/DiffTagToTagAction.java -text
 src/main/java/com/indeed/charm/actions/DiffTagToTrunkAction.java -text
 src/main/java/com/indeed/charm/actions/DisplayLogVisitor.java -text
+src/main/java/com/indeed/charm/actions/ExtractIssueKeyVisitor.java -text
 src/main/java/com/indeed/charm/actions/ListBranchesAction.java -text
 src/main/java/com/indeed/charm/actions/ListDependencyConflictsAction.java -text
 src/main/java/com/indeed/charm/actions/ListProjectsAction.java -text
@@ -35,6 +39,8 @@ src/main/java/com/indeed/charm/actions/MergeToBranchAction.java -text
 src/main/java/com/indeed/charm/actions/ShowIvyDependenciesAction.java -text
 src/main/java/com/indeed/charm/actions/UpgradeBranchIvyDependencyAction.java -text
 src/main/java/com/indeed/charm/actions/VCSActionSupport.java -text
+src/main/java/com/indeed/charm/issues/IssueTracker.java -text
+src/main/java/com/indeed/charm/issues/jira/JiraIssueTracker.java -text
 src/main/java/com/indeed/charm/ivy/IvyDependency.java -text
 src/main/java/com/indeed/charm/ivy/IvyLoader.java -text
 src/main/java/com/indeed/charm/ivy/IvyUtils.java -text

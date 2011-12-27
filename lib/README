@@ -1,0 +1,4 @@
+You'll need to install these JAR files in your local Maven repository in order to build:
+
+mvn install:install-file -DgroupId=com.indeed -DartifactId=common-jira -Dversion=0.1.1 -Dpackaging=jar -Dfile=common-jira.jar
+mvn install:install-file -DgroupId=com.indeed -DartifactId=atlassian-ws -Dversion=0.1.4 -Dpackaging=jar -Dfile=atlassian-ws.jar

@@ -36,7 +36,10 @@ public interface LogEntry {
     public void setLogMessage(String logMessage);
     public Collection<LogEntry> getBranchMergeRevisions();
     public void setBranchMergeRevisions(Collection<LogEntry> revisions);
-
     public void setLogMessageMatches(Collection<String> matches);
     public Collection<String> getLogMessageMatches();
+
+    public Map<String, String> getAdditionalFields();
+    public String getAdditionalField(String fieldName);
+    public String setAdditionalField(String fieldName, String fieldValue);
 }

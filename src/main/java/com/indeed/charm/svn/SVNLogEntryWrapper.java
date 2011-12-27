@@ -39,6 +39,7 @@ public class SVNLogEntryWrapper implements LogEntry {
     private Collection<LogEntry> branchMergeRevisions;
     private String logMessage;
     private Collection<String> logMessageMatches;
+    private Map<String, String> additionalFields = Maps.newHashMap();
 
     public SVNLogEntryWrapper(SVNLogEntry entry, String revisionUrlFormat) {
         this.entry = entry;
@@ -96,5 +97,17 @@ public class SVNLogEntryWrapper implements LogEntry {
 
     public String toString() {
         return entry.toString();
+    }
+
+    public Map<String, String> getAdditionalFields() {
+        return additionalFields;
+    }
+
+    public String setAdditionalField(String fieldName, String fieldValue) {
+        return additionalFields.put(fieldName, fieldValue);
+    }
+
+    public String getAdditionalField(String fieldName) {
+        return additionalFields.get(fieldName);
     }
 }

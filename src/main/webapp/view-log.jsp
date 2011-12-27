@@ -35,11 +35,14 @@
         <th>Revision</th>
         <th>Author</th>
         <th>Log Message</th>
+        <s:if test="%{foundAdditionalFields.contains('Fix Version')}">
+            <th nowrap>Fix Version(s)</th>
+        </s:if>
         <s:if test="showMergeToBranchLink">
             <th>Merge Status</th>
         </s:if>
     </tr>
-<s:iterator value="logEntries">
+<s:iterator value="logEntries" var="logEntry">
     <s:if test="%{warnRevisions.contains(revision)}">
         <tr style="background-color: #FFFF66">
     </s:if>
@@ -50,6 +53,14 @@
         <td><s:a target="_blank" href="%{revisionUrl}"><s:property value="revision"/></s:a></td>
         <td><s:property value="author"/></td>
         <td><s:property value="logMessage" escape="false"/></td>
+        <s:if test="%{foundAdditionalFields.contains('Fix Version')}">
+            <td>
+                <s:if test="%{additionalFields.containsKey('Fix Version')}">
+                    <s:property value="additionalFields['Fix Version']" escape="false"/>
+                </s:if>
+                <s:else>&nbsp;</s:else>
+            </td>
+        </s:if>
         <s:if test="showMergeToBranchLink">
             <td style="white-space: nowrap;">
             <s:if test="branchMergeRevisions.size == 0">

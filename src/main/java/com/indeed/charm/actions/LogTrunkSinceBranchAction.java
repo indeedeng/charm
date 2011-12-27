@@ -26,6 +26,8 @@ import com.indeed.charm.model.LogEntry;
 import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
 
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Set;
@@ -39,6 +41,7 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
     protected static final Pattern NUMERIC_REVISION_PATTERN = Pattern.compile("\\br?([1-9]\\d*)\\b");
 
     private Multimap<Long, LogEntry> possibleMerges;
+    private Set<String> foundAdditionalFields;
 
     @Override
     public String execute() throws Exception {
@@ -51,14 +54,17 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
             }
 
             loadPossibleMerges();
+            final ExtractIssueKeyVisitor issueKeyExtractor = new ExtractIssueKeyVisitor(env);
             final DisplayLogVisitor logVisitor = new WarningLogVisitor(env.getTrunkWarnIfMissingPatterns()) {
                 @Override
                 public void visit(LogEntry entry) {
+                    issueKeyExtractor.visit(entry);
                     super.visit(entry);
                     entry.setBranchMergeRevisions(possibleMerges.get(entry.getRevision()));
                 }
             };
             vcsClient.visitTrunkChangeLogSinceBranch(logVisitor, getProject(), getBranchDate(), 0, getPath());
+            foundAdditionalFields = issueKeyExtractor.process();
             setLogEntries(ImmutableList.copyOf(logVisitor.getEntries().values()));
         } catch (VCSException e) {
             log.error("Failed to get trunk log since branch", e);
@@ -92,5 +98,9 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
     public boolean isShowMergeToBranchLink() {
         final String path = getPath();
         return path == null || path.equals(".");
+    }
+
+    public Set<String> getFoundAdditionalFields() {
+        return foundAdditionalFields;
     }
 }

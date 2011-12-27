@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.*;
+
+import com.indeed.charm.issues.IssueTracker;
 import com.indeed.charm.svn.SubversionClient;
 
 import javax.servlet.ServletContext;
@@ -40,6 +42,8 @@ public class ReleaseEnvironment {
     private Properties properties;
     private List<LinkifyPattern> linkifyPatterns;
     private BiMap<String,String> repoNameMap;
+    private IssueTracker issueTracker;
+    private Pattern issueTrackerKeyPattern;
 
     protected static String getCharmPropertiesPath(ServletContext context) {
         String path = null;
@@ -256,6 +260,55 @@ public class ReleaseEnvironment {
             file.delete();
         }
         dir.delete();
+    }
+
+    public String getJiraUrl() {
+        return properties.getProperty("jira.url", "");
+    }
+
+    public String getJiraUser() {
+        return properties.getProperty("jira.user", "");
+    }
+
+    public String getJiraPassword() {
+        return properties.getProperty("jira.password", "");
+    }
+
+    public String getJiraFixVersionLink() {
+        return properties.getProperty("jira.fix-version.link", "");
+    }
+
+    public void initializeIssueTracker() {
+        final String trackerClass = properties.getProperty("issuetracker.class");
+        if (trackerClass != null) {
+            try {
+                Class<? extends IssueTracker> clz = Class.forName(trackerClass).asSubclass(IssueTracker.class);
+                final IssueTracker tracker = clz.newInstance();
+                if (tracker.init(this)) {
+                    this.issueTracker = tracker;
+                    log.info("Issue Tracker initialized.");
+                }
+            } catch (Exception e) {
+                log.error("failed to initialize issue tracker from class: " + trackerClass, e);
+            }
+        }
+    }
+
+    public IssueTracker getIssueTracker() {
+        return issueTracker;
+    }
+
+    public Pattern getIssueTrackerKeyPattern() {
+        if (issueTracker != null) {
+            if (issueTrackerKeyPattern == null) {
+                final String patternString = properties.getProperty("issuetracker.key.pattern");
+                if (patternString != null) {
+                    issueTrackerKeyPattern = Pattern.compile(patternString);
+                }
+            }
+            return issueTrackerKeyPattern;
+        }
+        return null;
     }
 
     private class CleanupTask extends TimerTask {

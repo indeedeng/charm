@@ -70,3 +70,18 @@ ivy.filename=ivy.xml
 
 # URL for Ivy repository
 #ivy.repo.url=http://example/repository
+
+# Currently supported issue tracker is JIRA
+#issuetracker.class=com.indeed.charm.issues.jira.JiraIssueTracker
+
+# Pattern to use to extract issue keys from log messages (example is JIRA)
+#issuetracker.key.pattern=(?!UTF-8)(\\b(UX|[A-Z]{3,20})-\\d{1,6}\\b)
+
+# Used by JiraIssueTracker to access JIRA via SOAP
+#jira.url=https://bugs.indeed.com/rpc/soap/jirasoapservice-v2
+#jira.user=
+#jira.password=
+
+# Used to link to JIRA fix versions: params are 0: project, 1: fix version ID, 2: fix version name
+#jira.fix-version.link=<a href="http://bugs/browse/{0}/fixforversion/{1}" target="_new">{2}</a>
+
