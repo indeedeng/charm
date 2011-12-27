@@ -80,6 +80,9 @@ public class JiraIssueTracker implements IssueTracker {
                     }
                 }
                 if (removed) {
+                    if (keys.isEmpty()) {
+                        return issueMap.build();
+                    }
                     query = getQueryBuilderForKeys(keys);
                     try {
                         results = controller.queryJira(query);
