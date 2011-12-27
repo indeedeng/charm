@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>charm</groupId>
     <artifactId>charm</artifactId>
-    <version>0.5</version>
+    <version>0.5.1</version>
     <packaging>war</packaging>
     <name>charm</name>
 
@@ -123,7 +123,7 @@
         <dependency>
             <groupId>com.indeed</groupId>
             <artifactId>common-jira</artifactId>
-            <version>0.1.1</version>
+            <version>0.1.2</version>
         </dependency>
 
         <!-- see lib/README -->

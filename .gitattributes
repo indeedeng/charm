@@ -2,8 +2,9 @@
 /COPYING -text
 /charm.properties.default -text
 lib/README -text
-lib/atlassian-ws.jar -text
-lib/common-jira.jar -text
+lib/atlassian-ws-0.1.4.jar -text
+lib/common-jira-0.1.2.jar -text
+lib/install-indeed-deps.sh -text
 /pom.xml -text
 src/main/Main.iml -text
 src/main/java/com/indeed/charm/ContextListener.java -text
