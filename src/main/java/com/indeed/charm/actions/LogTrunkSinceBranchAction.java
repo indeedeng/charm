@@ -26,12 +26,10 @@ import com.indeed.charm.model.LogEntry;
 import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
 
-import java.util.List;
-import java.util.Map;
+import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Set;
-import java.util.Collection;
 
 /**
  */
@@ -51,6 +49,18 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
             }
             if (getPath() == null) {
                 setPath(".");
+            }
+            if (getBranchDeployLink() == null) {
+                final String deployLinkTemplate = env.getDeployLink();
+                if (deployLinkTemplate != null) {
+                    final MessageFormat format = new MessageFormat(deployLinkTemplate);
+                    String project = getProject();
+                    String deployName = env.getDeployName(project);
+                    if (deployName != null) {
+                        project = deployName;
+                    }
+                    setBranchDeployLink(format.format(new Object[] { project, getBranchDate() }));
+                }
             }
 
             loadPossibleMerges();

@@ -96,7 +96,12 @@
         <s:param name="project" value="project"/>
         <s:param name="branchDate" value="branchDate"/>
     </s:url>
-    <p><s:a href="%{logBranchUrl}">branch log</s:a></p>
+    <p>
+        <s:a href="%{logBranchUrl}">view branch log</s:a>
+        <s:if test="branchDeployLink != null">
+            | <a href="<s:property value="branchDeployLink" escape="false"/>" target="_new">deploy &#8663;</a>
+        </s:if>
+    </p>
 </s:if>
 <s:if test="%{foundAdditionalFields.contains('Fix Version')}">
     <p id="filters">

@@ -85,3 +85,11 @@ ivy.filename=ivy.xml
 # Used to link to JIRA fix versions: params are 0: project, 1: fix version ID, 2: fix version name
 #jira.fix-version.link=<a href="http://bugs/browse/{0}/fixforversion/{1}" target="_new">{2}</a>
 
+# Optional link from "changes since branch" view to an automated build/deploy system, e.g. jenkins
+# params are 0: project, 1: branch date
+#branch.deploy.link=http://jenkins.example.com/job/{0}/buildWithParameters?BRANCH={1}
+
+# Map of project names to deploy tool project names (used with branch.deploy.link)
+# Not required if names match
+# Comma-separated list of colon-separated pairs (name:deploy-name). Example:
+#branch.deploy.name.map=foobar:foobar-deploy,awesome:awesome-deploy

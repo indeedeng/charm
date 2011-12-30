@@ -23,6 +23,7 @@ package com.indeed.charm.actions;
  */
 public abstract class BaseBranchAction extends VCSActionSupport {
     protected String branchDate;
+    protected String branchDeployLink;
 
     public String getBranchDate() {
         return branchDate;
@@ -30,5 +31,13 @@ public abstract class BaseBranchAction extends VCSActionSupport {
 
     public void setBranchDate(String branchDate) {
         this.branchDate = branchDate;
+    }
+
+    public String getBranchDeployLink() {
+        return branchDeployLink;
+    }
+
+    public void setBranchDeployLink(String branchDeployLink) {
+        this.branchDeployLink = branchDeployLink;
     }
 }

@@ -42,6 +42,7 @@ public class ReleaseEnvironment {
     private Properties properties;
     private List<LinkifyPattern> linkifyPatterns;
     private BiMap<String,String> repoNameMap;
+    private BiMap<String,String> deployNameMap;
     private IssueTracker issueTracker;
     private Pattern issueTrackerKeyPattern;
 
@@ -172,6 +173,27 @@ public class ReleaseEnvironment {
 
     public void putRepoName(String repo, String name) {
         getRepoNameMap().put(repo, name);
+    }
+
+    private BiMap<String, String> getDeployNameMap() {
+        if (deployNameMap == null) {
+            final BiMap<String, String> map = HashBiMap.create();
+            Iterable<String> entries = Splitter.on(',').trimResults().split(properties.getProperty("branch.deploy.name.map", ""));
+            for (String entry : entries) {
+                Iterator<String> pair = Splitter.on(':').trimResults().split(entry).iterator();
+                final String repo = pair.hasNext() ? pair.next() : null;
+                final String name = pair.hasNext() ? pair.next() : null;
+                if (repo != null && name != null) {
+                    map.put(repo, name);
+                }
+            }
+            deployNameMap = map;
+        }
+        return deployNameMap;
+    }
+
+    public String getDeployName(String projectName) {
+        return getDeployNameMap().get(projectName);
     }
 
     public Date getEarliestReleaseDate() {
@@ -309,6 +331,10 @@ public class ReleaseEnvironment {
             return issueTrackerKeyPattern;
         }
         return null;
+    }
+
+    public String getDeployLink() {
+        return properties.getProperty("branch.deploy.link");
     }
 
     private class CleanupTask extends TimerTask {
