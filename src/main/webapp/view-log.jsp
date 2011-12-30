@@ -4,8 +4,10 @@
     <title>CHARM SVN Log</title>
     <style type="text/css"><jsp:include page="charm.css"/></style>
     <link rel="shortcut icon" href="/charm/favicon.ico"/>
+    <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="jquery.ba-bbq.min.js"></script>
 </head>
-<body>
+<body onload="addFixVersionFilters()">
 <script type="text/javascript">
     function formatDate(time) {
         var d = new Date();
@@ -17,6 +19,73 @@
         var minute = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
         return year + "-" + month + "-" + date + " " + hour + ":" + minute;
     }
+
+    function handleFixVersionHiding() {
+        $.each($('td.fixVersion'), function(index, element) {
+            var anchors = $(this).find('a');
+            var hidden = true;
+            if (anchors.size() == 0) {
+                var tog = document.getElementById('nofixversion');
+                if (tog && tog.checked) {
+                    hidden = false;
+                }
+            } else {
+                $.each(anchors, function(i, e) {
+                    var tog = document.getElementById(e.innerHTML);
+                    if (tog && tog.checked) {
+                        hidden = false;
+                        return false; // break out
+                    }
+                });
+            }
+            if (hidden) {
+                $(this).parentsUntil('tbody').hide();
+            } else {
+                $(this).parentsUntil('tbody').show();
+            }
+        });
+        updateFragment();
+    }
+
+    function addFixVersionFilters() {
+        var filterObj = new Object();
+        $.each($('td.fixVersion'), function(index, element) {
+            var anchors = $(this).find('a');
+            $.each(anchors, function(i, e) {
+                filterObj[e.innerHTML] = 1;
+            });
+        });
+        var filterSet = new Array();
+        for (var filter in filterObj) {
+            filterSet.push(filter);
+        }
+        var hidden = $.deparam.fragment().h;
+        if (hidden && $.inArray("nofixversion", hidden) > -1) {
+            document.getElementById("nofixversion").checked = false;
+        }
+        for (var index in filterSet.sort()) {
+            var fv = filterSet[index];
+            var checked = (hidden ? $.inArray(fv, hidden) == -1 : true);
+            $('#filters').append(
+                    "<span style='display: inline-block;'>" +
+                    "<input type='checkbox' class='tgl' id='" + fv + "' " +
+                    (checked ? "checked='true'" : "") +
+                    "onclick='handleFixVersionHiding()'/>" +
+                    "<label for='" + fv + "'>" + fv + "</label>&nbsp;</span>");
+        }
+        handleFixVersionHiding();
+    }
+
+    function updateFragment() {
+        var hash = new Object();
+        hash.h = new Array();
+        $.each($('input.tgl'), function(i, e) {
+            if (!e.checked) {
+                hash.h.push(e.id);
+            }
+        });
+        location.hash = $.param(hash);
+    }
 </script>
 <h2><s:property value="name"/> since <s:property value="since"/></h2>
 <s:if test='path != "."'>
@@ -27,9 +96,14 @@
         <s:param name="project" value="project"/>
         <s:param name="branchDate" value="branchDate"/>
     </s:url>
-    <s:a href="%{logBranchUrl}">branch log</s:a>
+    <p><s:a href="%{logBranchUrl}">branch log</s:a></p>
 </s:if>
-<table>
+<s:if test="%{foundAdditionalFields.contains('Fix Version')}">
+    <p id="filters">
+        Filters: <span style="display: inline-block;"><input type="checkbox" class='tgl' id="nofixversion" checked="true" onclick="handleFixVersionHiding()"/><label for="nofixversion">No Fix Version</label>&nbsp;</span>
+    </p>
+</s:if>
+<table><tbody>
     <tr>
         <th>Date</th>
         <th>Revision</th>
@@ -54,11 +128,13 @@
         <td><s:property value="author"/></td>
         <td><s:property value="logMessage" escape="false"/></td>
         <s:if test="%{foundAdditionalFields.contains('Fix Version')}">
-            <td>
+            <td class="fixVersion">
                 <s:if test="%{additionalFields.containsKey('Fix Version')}">
                     <s:property value="additionalFields['Fix Version']" escape="false"/>
                 </s:if>
-                <s:else>&nbsp;</s:else>
+                <s:else>
+                    <span style='display:none' class='nofixversion'>&nbsp;</span>
+                </s:else>
             </td>
         </s:if>
         <s:if test="showMergeToBranchLink">
@@ -81,7 +157,7 @@
         </s:if>
     </tr>
 </s:iterator>
-</table>
+</tbody></table>
 <s:if test="%{branchDate != null}">
     <s:url var="projectUrl" action="listBranches">
         <s:param name="project" value="project"/>

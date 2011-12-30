@@ -64,6 +64,8 @@ src/main/webapp/WEB-INF/web.xml -text
 src/main/webapp/ajax.js -text
 src/main/webapp/charm.css -text
 src/main/webapp/favicon.ico -text
+src/main/webapp/jquery-1.7.1.min.js -text
+src/main/webapp/jquery.ba-bbq.min.js -text
 src/main/webapp/list-dependencies-text.jsp -text
 src/main/webapp/merge-login.jsp -text
 src/main/webapp/show-conflicts.jsp -text
