@@ -22,6 +22,19 @@
     </s:else>
         dependencies
 </h2>
+<p>
+    view:
+    <s:url var="logChangesUrl" action="logTrunkSinceBranch">
+        <s:param name="project" value="project"/>
+        <s:param name="branchDate" value="branchDate"/>
+    </s:url>
+    &nbsp;&nbsp;<a href="<s:property value="logChangesUrl" escape="false"/>">changes since branch</a>
+    <s:url var="logBranchUrl" action="logBranch">
+        <s:param name="project" value="project"/>
+        <s:param name="branchDate" value="branchDate"/>
+    </s:url>
+    &nbsp;&nbsp;<a href="<s:property value="logBranchUrl" escape="false"/>">branch log</a>
+</p>
 <s:url var="analyzeUrl" action="listDependencyConflicts">
     <s:param name="project" value="project"/>
     <s:param name="branchDate" value="branchDate"/>

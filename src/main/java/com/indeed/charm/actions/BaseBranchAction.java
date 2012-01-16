@@ -19,6 +19,8 @@
 
 package com.indeed.charm.actions;
 
+import java.text.MessageFormat;
+
 /**
  */
 public abstract class BaseBranchAction extends VCSActionSupport {
@@ -34,6 +36,18 @@ public abstract class BaseBranchAction extends VCSActionSupport {
     }
 
     public String getBranchDeployLink() {
+        if (branchDeployLink == null) {
+            final String deployLinkTemplate = env.getDeployLink();
+            if (deployLinkTemplate != null) {
+                final MessageFormat format = new MessageFormat(deployLinkTemplate);
+                String project = getProject();
+                String deployName = env.getDeployName(project);
+                if (deployName != null) {
+                    project = deployName;
+                }
+                branchDeployLink = format.format(new Object[] { project, getBranchDate() });
+            }
+        }
         return branchDeployLink;
     }
 

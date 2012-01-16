@@ -97,12 +97,37 @@
         <s:param name="branchDate" value="branchDate"/>
     </s:url>
     <p>
-        <s:a href="%{logBranchUrl}">view branch log</s:a>
+        view:
+        &nbsp;&nbsp;<s:a href="%{logBranchUrl}">branch log</s:a>
+        <s:if test="%{ivyEnabled}">
+            <s:url var="depsUrl" action="showIvyDeps">
+                <s:param name="project" value="project"/>
+                <s:param name="branchDate" value="branchDate"/>
+            </s:url>
+            &nbsp;&nbsp<a href="<s:property value="depsUrl" escape="false"/>">branch dependencies</a>
+        </s:if>
         <s:if test="branchDeployLink != null">
-            | <a href="<s:property value="branchDeployLink" escape="false"/>" target="_new">deploy &#8663;</a>
+            &nbsp;&nbsp;| &nbsp;&nbsp;<a href="<s:property value="branchDeployLink" escape="false"/>" target="_new">deploy &#8663;</a>
         </s:if>
     </p>
 </s:if>
+<s:else>
+    <p>
+        view:
+        <s:url var="logChangesUrl" action="logTrunkSinceBranch">
+            <s:param name="project" value="project"/>
+            <s:param name="branchDate" value="branchDate"/>
+        </s:url>
+        &nbsp;&nbsp;<a href="<s:property value="logChangesUrl" escape="false"/>">changes since branch</a>
+        <s:if test="%{ivyEnabled}">
+            <s:url var="depsUrl" action="showIvyDeps">
+                <s:param name="project" value="project"/>
+                <s:param name="branchDate" value="branchDate"/>
+            </s:url>
+            &nbsp;&nbsp;<a href="<s:property value="depsUrl" escape="false"/>">branch dependencies</a>
+        </s:if>
+    </p>
+</s:else>
 <s:if test="%{foundAdditionalFields.contains('Fix Version')}">
     <p id="filters">
         Filters: <span style="display: inline-block;"><input type="checkbox" class='tgl' id="nofixversion" checked="true" onclick="handleFixVersionHiding()"/><label for="nofixversion">No Fix Version</label>&nbsp;</span>

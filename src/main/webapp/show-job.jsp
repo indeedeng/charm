@@ -31,6 +31,9 @@
 <s:if test="job.running">
     <tr><td><s:a href="%{refreshUrl}">refresh</s:a></td></tr>
 </s:if>
+<s:elseif test="branchDeployLink != null">
+    <tr><td><a href="<s:property value="branchDeployLink" escape="false"/>" target="_new">deploy &#8663;</a></td></tr>
+</s:elseif>
 <s:url var="cleanupUrl" action="cleanupBranchWC">
     <s:param name="project" value="project"/>
     <s:param name="branchDate" value="branchDate"/>

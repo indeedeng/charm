@@ -50,18 +50,6 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
             if (getPath() == null) {
                 setPath(".");
             }
-            if (getBranchDeployLink() == null) {
-                final String deployLinkTemplate = env.getDeployLink();
-                if (deployLinkTemplate != null) {
-                    final MessageFormat format = new MessageFormat(deployLinkTemplate);
-                    String project = getProject();
-                    String deployName = env.getDeployName(project);
-                    if (deployName != null) {
-                        project = deployName;
-                    }
-                    setBranchDeployLink(format.format(new Object[] { project, getBranchDate() }));
-                }
-            }
 
             loadPossibleMerges();
             final ExtractIssueKeyVisitor issueKeyExtractor = new ExtractIssueKeyVisitor(env);
