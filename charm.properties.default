@@ -53,6 +53,14 @@ release.history.maxdays=365
 #linkify.pattern.FISHEYE=(\\br([1-9]\\d*)\\b)
 #linkify.replacement.FISHEYE=<a target="_blank" href="https://fisheye.example.com/changelog/MainRepo/?cs=$2">$1</a>
 
+# Java regular expressions to use to transform commit messages before merging
+# Example shows Fisheye/Crucible smart commit tags being munged to avoid confusing the system on merge commits
+#commit.patterns=CRUCIBLEREVIEW,HASHTAGS
+#commit.pattern.CRUCIBLEREVIEW=\\+review
+#commit.replacement.CRUCIBLEREVIEW=\\+review
+#commit.pattern.HASHTAGS=\\#(\\S+)
+#commit.replacement.HASHTAGS=_$1
+
 # Highlight trunk log entries if any of the listed linkify patterns (comma-separated) are not found
 #log.trunk.warn-if-missing=JIRA
 
