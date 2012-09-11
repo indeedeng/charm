@@ -36,6 +36,7 @@ public class MergeToBranchAction extends BaseBranchAction {
     private Long jobId;
     private String user;
     private String password;
+    private String commitMessage;
     private Long revision;
     private BackgroundJob<Boolean> job;
 
@@ -50,6 +51,8 @@ public class MergeToBranchAction extends BaseBranchAction {
             }
         }
         if (user == null || password == null) {
+            final String rlogMessage = vcsClient.getTrunkLogEntry(project, revision).getLogMessage();
+            commitMessage = "merged r" + revision + ": " + env.transformCommitMessage(rlogMessage, null);
             return LOGIN;
         }
         if (revision == null) {
@@ -67,7 +70,7 @@ public class MergeToBranchAction extends BaseBranchAction {
                     log("Checked out branch dir at revision " + r);
                     setStatus("Merging " + revision);
                     log("svn merge -r" + (revision-1) + ":" + revision + " && svn commit");
-                    CommitInfo info = vcsClient.mergeToBranch(project, revision, branchDate, "", branchDir);
+                    CommitInfo info = vcsClient.mergeToBranch(project, revision, branchDate, commitMessage, branchDir);
                     log("Merge/commit complete");
                     log(info.toString());
                     return true;
@@ -135,5 +138,13 @@ public class MergeToBranchAction extends BaseBranchAction {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getCommitMessage() {
+        return commitMessage;
+    }
+
+    public void setCommitMessage(String commitMessage) {
+        this.commitMessage = commitMessage;
     }
 }

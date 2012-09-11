@@ -84,7 +84,7 @@ public interface VCSClient {
 
     CommitInfo commit(File file, String message) throws VCSException;
 
-    CommitInfo mergeToBranch(String project, long revision, String branchDate, String messagePrefix, File workingDir) throws VCSException, IOException;
+    CommitInfo mergeToBranch(String project, long revision, String branchDate, String message, File workingDir) throws VCSException, IOException;
 
     LogEntry getTrunkLogEntry(String project, long revision) throws VCSException;
 

@@ -383,7 +383,7 @@ public class SubversionClient implements VCSClient {
         }
     }
 
-    public CommitInfo mergeToBranch(String project, long revision, String branchDate, String messagePrefix, File workingDir) throws VCSException, IOException {
+    public CommitInfo mergeToBranch(String project, long revision, String branchDate, String commitMessage, File workingDir) throws VCSException, IOException {
         try {
             final long branchRev = checkoutBranch(project, branchDate, workingDir);
             if (branchRev > 0) {
@@ -394,8 +394,6 @@ public class SubversionClient implements VCSClient {
                 final SVNRevision rev = SVNRevision.create(revision);
                 diffClient.doMerge(url, pegRev, prevRev, rev, workingDir, true, true, false, false);
 
-                final String rlogMessage = getTrunkLogEntry(project, revision).getLogMessage();
-                final String commitMessage = messagePrefix + " merged r" + revision + ": " + rlogMessage;
                 final SVNCommitClient commitClient = clientManager.getCommitClient();
                 return new SVNCommitInfoWrapper(commitClient.doCommit(new File[]{workingDir}, false, commitMessage, null, null, false, false, SVNDepth.INFINITY));
             }

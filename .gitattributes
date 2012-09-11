@@ -8,9 +8,9 @@ lib/install-indeed-deps.sh -text
 /pom.xml -text
 src/main/Main.iml -text
 src/main/java/com/indeed/charm/ContextListener.java -text
-src/main/java/com/indeed/charm/LinkifyPattern.java -text
 src/main/java/com/indeed/charm/ProjectsLoader.java -text
 src/main/java/com/indeed/charm/ReleaseEnvironment.java -text
+src/main/java/com/indeed/charm/ReplacementPattern.java -text
 src/main/java/com/indeed/charm/VCSClient.java -text
 src/main/java/com/indeed/charm/VCSException.java -text
 src/main/java/com/indeed/charm/actions/BackgroundJob.java -text

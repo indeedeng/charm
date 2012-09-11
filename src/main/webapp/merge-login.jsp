@@ -10,6 +10,7 @@
 <s:form action="mergeToBranch" method="POST">
     <s:textfield name="user" label="User"/>
     <s:password name="password" label="Password"/>
+    <s:textarea name="commitMessage" label="Commit Message" value="%{commitMessage}" rows="5" cols="70"/>
     <s:hidden name="project" value="%{project}"/>
     <s:hidden name="branchDate" value="%{branchDate}"/>
     <s:hidden name="revision" value="%{revision}"/>

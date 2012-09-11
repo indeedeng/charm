@@ -24,14 +24,14 @@ import java.util.regex.Matcher;
 
 /**
  */
-public class LinkifyPattern {
+public class ReplacementPattern {
 
     private final String name;
     private final Pattern pattern;
     private final String replacement;
 
 
-    LinkifyPattern(String name, String pattern, String replacement) {
+    ReplacementPattern(String name, String pattern, String replacement) {
         this.name = name;
         this.pattern = Pattern.compile(pattern);
         this.replacement = replacement;

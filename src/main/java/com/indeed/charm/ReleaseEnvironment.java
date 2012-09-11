@@ -40,7 +40,8 @@ public class ReleaseEnvironment {
     public static Splitter versionSplitter = Splitter.on(".");
 
     private Properties properties;
-    private List<LinkifyPattern> linkifyPatterns;
+    private List<ReplacementPattern> linkifyPatterns;
+    private List<ReplacementPattern> commitTransformPatterns;
     private BiMap<String,String> repoNameMap;
     private BiMap<String,String> deployNameMap;
     private IssueTracker issueTracker;
@@ -116,15 +117,15 @@ public class ReleaseEnvironment {
         return properties.getProperty("repo.rev.url", "#%1$d");
     }
 
-    public List<LinkifyPattern> getLinkifyPatterns() {
+    public List<ReplacementPattern> getLinkifyPatterns() {
         if (linkifyPatterns == null) {
-            ImmutableList.Builder<LinkifyPattern> builder = ImmutableList.builder();
+            ImmutableList.Builder<ReplacementPattern> builder = ImmutableList.builder();
             String[] names = properties.getProperty("linkify.patterns", "JIRA,FISHEYE").split(",");
             for (String name : names) {
                 if (name.trim().length() > 0) {
                     final String pattern = properties.getProperty("linkify.pattern." + name);
                     final String replacement = properties.getProperty("linkify.replacement." + name);
-                    builder.add(new LinkifyPattern(name, pattern, replacement));
+                    builder.add(new ReplacementPattern(name, pattern, replacement));
                 }
             }
             linkifyPatterns = builder.build();
@@ -132,14 +133,42 @@ public class ReleaseEnvironment {
         return linkifyPatterns;
     }
 
+    public List<ReplacementPattern> getCommitTransformPatterns() {
+        if (commitTransformPatterns == null) {
+            ImmutableList.Builder<ReplacementPattern> builder = ImmutableList.builder();
+            String[] names = properties.getProperty("commit.patterns", "").split(",");
+            for (String name : names) {
+                if (name.trim().length() > 0) {
+                    final String pattern = properties.getProperty("commit.pattern." + name);
+                    final String replacement = properties.getProperty("commit.replacement." + name);
+                    builder.add(new ReplacementPattern(name, pattern, replacement));
+                }
+            }
+            commitTransformPatterns = builder.build();
+        }
+        return commitTransformPatterns;
+    }
 
     public String linkify(String value, Collection<String> appliedPatterns) {
-        for (LinkifyPattern linkifier : getLinkifyPatterns()) {
+        for (ReplacementPattern linkifier : getLinkifyPatterns()) {
             String newValue = linkifier.apply(value);
             if (!newValue.equals(value)) {
                 value = newValue;
                 if (appliedPatterns != null) {
                     appliedPatterns.add(linkifier.getName());
+                }
+            }
+        }
+        return value;
+    }
+
+    public String transformCommitMessage(String value, Collection<String> appliedPatterns) {
+        for (ReplacementPattern commitTransformer : getCommitTransformPatterns()) {
+            String newValue = commitTransformer.apply(value);
+            if (!newValue.equals(value)) {
+                value = newValue;
+                if (appliedPatterns != null) {
+                    appliedPatterns.add(commitTransformer.getName());
                 }
             }
         }
