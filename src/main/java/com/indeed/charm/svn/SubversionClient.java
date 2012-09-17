@@ -31,6 +31,8 @@ import java.util.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -203,12 +205,26 @@ public class SubversionClient implements VCSClient {
         }
     }
 
+    // pretty big hack to extend branch log back to a revision referred to in the branch creation message in form  "from rNNNNNNN"
+    private static final Pattern FROM_REVISION_PATTERN = Pattern.compile("from r(\\d+)");
+
     public void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, int limit, String... paths) throws VCSException {
         try {
             final SVNURL branchUrl = SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getBranchPath() + branchDate);
             final SVNLogClient logClient = new SVNLogClient(authManager, null);
             final SVNRevision revStart = SVNRevision.create(0);
-            logClient.doLog(branchUrl, paths, revStart, revStart, SVNRevision.HEAD, true, false, limit, new SVNLogEntryVisitor(visitor, revisionUrlFormat));
+            SVNLogEntryVisitor svnVisitor = new SVNLogEntryVisitor(visitor, revisionUrlFormat);
+            logClient.doLog(branchUrl, paths, revStart, revStart, SVNRevision.HEAD, true, false, limit, svnVisitor);
+            final SVNLogEntry lastEntry = svnVisitor.getLastEntry();
+            if (lastEntry != null) {
+                final Matcher m = FROM_REVISION_PATTERN.matcher(lastEntry.getMessage());
+                if (m.find()) {
+                    final int revisionNumber = Integer.parseInt(m.group(1));
+                    final SVNRevision startRev = SVNRevision.create(lastEntry.getRevision() - 1);
+                    final SVNRevision endRev = SVNRevision.create(revisionNumber);
+                    logClient.doLog(branchUrl, paths, startRev, endRev, SVNRevision.HEAD, false, false, limit, svnVisitor);
+                }
+            }
         } catch (SVNException e) {
             throw new VCSException(e);
         }
