@@ -60,9 +60,13 @@ public interface VCSClient {
 
     void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, int limit, String... paths) throws VCSException;
 
+    void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, boolean extendToBranchPointUsingComment, int limit, String... paths) throws VCSException;
+
     void visitTagChangeLog(LogEntryVisitor visitor, String project, String tag, int limit, String... paths) throws VCSException;
 
     long getBranchStartRevision(String project, String branchDate) throws VCSException;
+
+    long getBranchStartRevision(String project, String branchDate, boolean extendToBranchPointFromComment) throws VCSException;
 
     void visitTrunkChangeLogSinceBranch(LogEntryVisitor visitor, String project, String branchDate, int limit, String... paths) throws VCSException;
 

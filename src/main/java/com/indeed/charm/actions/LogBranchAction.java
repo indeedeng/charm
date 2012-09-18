@@ -42,7 +42,7 @@ public class LogBranchAction extends BaseBranchLogAction {
                 setPath(".");
             }
 
-            setRevision(vcsClient.getBranchStartRevision(project, branchDate));
+            setRevision(vcsClient.getBranchStartRevision(project, branchDate, true));
             final DisplayLogVisitor logVisitor = new WarningLogVisitor(env.getBranchWarnIfMissingPatterns());
             vcsClient.visitBranchChangeLog(logVisitor, getProject(), getBranchDate(), 0, getPath());
             setLogEntries(ImmutableList.copyOf(logVisitor.getEntries().values()));

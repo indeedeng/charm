@@ -209,6 +209,10 @@ public class SubversionClient implements VCSClient {
     private static final Pattern FROM_REVISION_PATTERN = Pattern.compile("from r(\\d+)");
 
     public void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, int limit, String... paths) throws VCSException {
+        visitBranchChangeLog(visitor, project, branchDate, false, limit, paths);
+    }
+
+    public void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, boolean extendToBranchPointUsingComment, int limit, String... paths) throws VCSException {
         try {
             final SVNURL branchUrl = SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getBranchPath() + branchDate);
             final SVNLogClient logClient = new SVNLogClient(authManager, null);
@@ -216,7 +220,7 @@ public class SubversionClient implements VCSClient {
             SVNLogEntryVisitor svnVisitor = new SVNLogEntryVisitor(visitor, revisionUrlFormat);
             logClient.doLog(branchUrl, paths, revStart, revStart, SVNRevision.HEAD, true, false, limit, svnVisitor);
             final SVNLogEntry lastEntry = svnVisitor.getLastEntry();
-            if (lastEntry != null) {
+            if (extendToBranchPointUsingComment && lastEntry != null) {
                 final Matcher m = FROM_REVISION_PATTERN.matcher(lastEntry.getMessage());
                 if (m.find()) {
                     final int revisionNumber = Integer.parseInt(m.group(1));
@@ -242,12 +246,16 @@ public class SubversionClient implements VCSClient {
     }
 
     public long getBranchStartRevision(String project, String branchDate) throws VCSException {
+        return getBranchStartRevision(project, branchDate, false);
+    }
+
+    public long getBranchStartRevision(String project, String branchDate, boolean extendToBranchPointFromComment) throws VCSException {
         final long[] rev = new long[1];
         visitBranchChangeLog(new LogEntryVisitor() {
             public void visit(LogEntry entry) {
                 rev[0] = entry.getRevision();
             }
-        }, project, branchDate, 1, ".");
+        }, project, branchDate, extendToBranchPointFromComment, 1, ".");
         return rev[0];
     }
 
@@ -255,7 +263,7 @@ public class SubversionClient implements VCSClient {
         try {
             final SVNURL trunkUrl = SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getTrunkPath());
             final SVNLogClient logClient = new SVNLogClient(authManager, null);
-            final SVNRevision revStart = SVNRevision.create(getBranchStartRevision(project, branchDate));
+            final SVNRevision revStart = SVNRevision.create(getBranchStartRevision(project, branchDate, true));
             logClient.doLog(trunkUrl, paths, revStart, revStart, SVNRevision.HEAD, true, false, limit, new SVNLogEntryVisitor(visitor, revisionUrlFormat));
         } catch (SVNException e) {
             throw new VCSException(e);
@@ -392,7 +400,7 @@ public class SubversionClient implements VCSClient {
         try {
             final SVNUpdateClient updateClient = clientManager.getUpdateClient();
             final SVNURL branchUrl = SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getBranchPath() + branchDate);
-            final SVNRevision revStart = SVNRevision.create(getBranchStartRevision(project, branchDate));
+            final SVNRevision revStart = SVNRevision.create(getBranchStartRevision(project, branchDate, false));
             return updateClient.doCheckout(branchUrl, workingDir, revStart, SVNRevision.HEAD, SVNDepth.INFINITY, false);
         } catch (SVNException e) {
             throw new VCSException(e);
