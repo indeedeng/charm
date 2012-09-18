@@ -44,7 +44,7 @@ public class LogBranchAction extends BaseBranchLogAction {
 
             setRevision(vcsClient.getBranchStartRevision(project, branchDate, true));
             final DisplayLogVisitor logVisitor = new WarningLogVisitor(env.getBranchWarnIfMissingPatterns());
-            vcsClient.visitBranchChangeLog(logVisitor, getProject(), getBranchDate(), 0, getPath());
+            vcsClient.visitBranchChangeLog(logVisitor, getProject(), getBranchDate(), true, 0, getPath());
             setLogEntries(ImmutableList.copyOf(logVisitor.getEntries().values()));
         } catch (VCSException e) {
             log.error("Failed to get branch log", e);
