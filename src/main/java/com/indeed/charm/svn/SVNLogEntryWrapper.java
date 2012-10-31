@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Date;
 import java.util.Collection;
 
+import org.apache.commons.lang.xwork.StringEscapeUtils;
+
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 
@@ -59,7 +61,7 @@ public class SVNLogEntryWrapper implements LogEntry {
     }
 
     public String getLogMessage() {
-        return logMessage != null ? logMessage : entry.getMessage();
+        return logMessage != null ? logMessage : StringEscapeUtils.escapeHtml(entry.getMessage());
     }
 
     public void setLogMessage(String logMessage) {
