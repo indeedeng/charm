@@ -28,7 +28,7 @@ import com.indeed.charm.actions.LogEntryVisitor;
 public class SVNLogEntryVisitor implements ISVNLogEntryHandler {
     private final LogEntryVisitor visitor;
     private final String revisionUrlFormat;
-    private SVNLogEntry lastEntry;
+    private SVNLogEntry oldestEntry;
 
     public SVNLogEntryVisitor(LogEntryVisitor visitor, String revisionUrlFormat) {
         this.visitor = visitor;
@@ -36,11 +36,13 @@ public class SVNLogEntryVisitor implements ISVNLogEntryHandler {
     }
 
     public void handleLogEntry(SVNLogEntry svnLogEntry) throws SVNException {
-        lastEntry = svnLogEntry;
+        if (oldestEntry == null || oldestEntry.getRevision() > svnLogEntry.getRevision()) {
+            oldestEntry = svnLogEntry;
+        }
         visitor.visit(new SVNLogEntryWrapper(svnLogEntry, revisionUrlFormat));
     }
 
-    public SVNLogEntry getLastEntry() {
-        return lastEntry;
+    public SVNLogEntry getOldestEntry() {
+        return oldestEntry;
     }
 }

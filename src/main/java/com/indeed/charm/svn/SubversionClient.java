@@ -219,12 +219,12 @@ public class SubversionClient implements VCSClient {
             final SVNRevision revStart = SVNRevision.create(0);
             SVNLogEntryVisitor svnVisitor = new SVNLogEntryVisitor(visitor, revisionUrlFormat);
             logClient.doLog(branchUrl, paths, revStart, revStart, SVNRevision.HEAD, true, false, limit, svnVisitor);
-            final SVNLogEntry lastEntry = svnVisitor.getLastEntry();
-            if (extendToBranchPointUsingComment && lastEntry != null) {
-                final Matcher m = FROM_REVISION_PATTERN.matcher(lastEntry.getMessage());
+            final SVNLogEntry oldestEntry = svnVisitor.getOldestEntry();
+            if (extendToBranchPointUsingComment && oldestEntry != null) {
+                final Matcher m = FROM_REVISION_PATTERN.matcher(oldestEntry.getMessage());
                 if (m.find()) {
                     final int revisionNumber = Integer.parseInt(m.group(1));
-                    final SVNRevision startRev = SVNRevision.create(lastEntry.getRevision() - 1);
+                    final SVNRevision startRev = SVNRevision.create(oldestEntry.getRevision() - 1);
                     final SVNRevision endRev = SVNRevision.create(revisionNumber);
                     logClient.doLog(branchUrl, paths, startRev, endRev, SVNRevision.HEAD, false, false, limit, svnVisitor);
                 }
