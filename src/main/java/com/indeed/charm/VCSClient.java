@@ -70,6 +70,8 @@ public interface VCSClient {
 
     void visitTrunkChangeLogSinceBranch(LogEntryVisitor visitor, String project, String branchDate, int limit, String... paths) throws VCSException;
 
+    LogEntry getTagFirstLogEntry(String project, String tag) throws VCSException;
+
     long getTagFirstRevision(String project, String tag) throws VCSException;
 
     void visitTrunkChangeLogSinceTag(LogEntryVisitor visitor, String project, String tag, int limit, String... paths) throws VCSException;

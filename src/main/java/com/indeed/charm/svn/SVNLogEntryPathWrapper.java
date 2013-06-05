@@ -39,6 +39,14 @@ public class SVNLogEntryPathWrapper implements LogEntryPath {
         return path.getPath();
     }
 
+    public String getCopyPath() {
+        return path.getCopyPath();
+    }
+
+    public long getCopyRevision() {
+        return path.getCopyRevision();
+    }
+
     public String toString() {
         return path.toString();
     }

@@ -19,6 +19,9 @@
 
 package com.indeed.charm.svn;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.*;
 import org.tmatesoft.svn.core.wc.*;
@@ -41,6 +44,7 @@ import com.indeed.charm.ReleaseEnvironment;
 import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
 import com.indeed.charm.model.LogEntry;
+import com.indeed.charm.model.LogEntryPath;
 import com.indeed.charm.model.CommitInfo;
 import com.indeed.charm.model.DiffStatus;
 import com.indeed.charm.model.DirEntry;
@@ -116,17 +120,20 @@ public class SubversionClient implements VCSClient {
     }
 
     public boolean hasTrunkCommitsSinceTag(String project, String tag) throws VCSException {
-        final boolean[] trunkDiff = new boolean[1];
-        visitTagToTrunkDiffStatus(new DiffStatusVisitor() {
-            public boolean visit(DiffStatus diffStatus) {
-                if (!"none".equals(diffStatus.getModificationType())) {
-                    trunkDiff[0] = true;
-                    return false;
-                }
-                return true;
+        LogEntry entry = getTagFirstLogEntry(project, tag);
+        Map<String,LogEntryPath> paths = entry.getPaths();
+        for (LogEntryPath path : paths.values()) {
+            if (path.getCopyPath() == null) {
+                continue;
+            } else if (!path.getCopyPath().endsWith("trunk")) {
+                throw new VCSException(new Exception("Not copied from trunk: " + path));
+            } else {
+                long taggedFrom = path.getCopyRevision();
+                long latest = getLatestRevision(path.getCopyPath());
+                return latest > taggedFrom;
             }
-        }, project, tag);
-        return trunkDiff[0];
+        }
+        throw new VCSException(new Exception("No copyfrom-path found for " + entry));
     }
 
     public void visitTagToTagDiffStatus(DiffStatusVisitor visitor, String project, String tag1, String tag2) throws VCSException {
@@ -180,13 +187,15 @@ public class SubversionClient implements VCSClient {
     public void visitTagDiffStatus(DiffStatusVisitor visitor, String project, String version1, String version2) throws VCSException {
         try {
             SVNDiffClient differ = new SVNDiffClient(authManager, null);
-            differ.doDiffStatus(SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getTagPath() + version1),
+            differ.doDiffStatus(
+                    SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getTagPath() + version1),
                     SVNRevision.HEAD,
                     SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getTagPath() + version2),
                     SVNRevision.HEAD,
                     SVNDepth.INFINITY,
                     false,
-                    new SVNDiffStatusVisitor(visitor));
+                    new SVNDiffStatusVisitor(visitor)
+            );
         } catch (SVNException e) {
             if (e.getErrorMessage().getErrorCode() != SVNErrorCode.CANCELLED) {
                 throw new VCSException(e);
@@ -239,7 +248,7 @@ public class SubversionClient implements VCSClient {
             final SVNURL tagUrl = SVNURL.parseURIDecoded(env.getRootUrl() + project + env.getTagPath() + tag);
             final SVNLogClient logClient = new SVNLogClient(authManager, null);
             final SVNRevision revStart = SVNRevision.create(0);
-            logClient.doLog(tagUrl, paths, revStart, revStart, SVNRevision.HEAD, true, false, limit, new SVNLogEntryVisitor(visitor, revisionUrlFormat));
+            logClient.doLog(tagUrl, paths, revStart, revStart, SVNRevision.HEAD, true, true, limit, new SVNLogEntryVisitor(visitor, revisionUrlFormat));
         } catch (SVNException e) {
             throw new VCSException(e);
         }
@@ -270,14 +279,22 @@ public class SubversionClient implements VCSClient {
         }
     }
 
-    public long getTagFirstRevision(String project, String tag) throws VCSException {
-        final long[] rev = new long[1];
+    public LogEntry getTagFirstLogEntry(String project, String tag) throws VCSException {
+        final LogEntry[] ret = new LogEntry[1];
         visitTagChangeLog(new LogEntryVisitor() {
             public void visit(LogEntry entry) {
-                rev[0] = entry.getRevision();
+                ret[0] = entry;
             }
         }, project, tag, 1, ".");
-        return rev[0];
+        return ret[0];
+    }
+
+    public long getTagFirstRevision(String project, String tag) throws VCSException {
+        LogEntry entry = getTagFirstLogEntry(project, tag);
+        if (entry != null) {
+            return entry.getRevision();
+        }
+        return -1;
     }
 
     public void visitTrunkChangeLogSinceTag(LogEntryVisitor visitor, String project, String tag, int limit, String... paths) throws VCSException {
@@ -496,8 +513,11 @@ public class SubversionClient implements VCSClient {
     }
 
     public static void main(String[] args) throws Exception {
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.ERROR);
         VCSClient sc = new SubversionClient(new ReleaseEnvironment());
-        System.out.println(sc.getLatestRevision(args[0]));
+        System.out.println(sc.hasTrunkCommitsSinceTag(args[0], args[1]));
+//        System.out.println(sc.getLatestRevision(args[0]));
 //        final ISVNDiffStatusHandler dsHandler = new ISVNDiffStatusHandler() {
 //            public void handleDiffStatus(SVNDiffStatus svnDiffStatus) throws VCSException {
 //                System.out.println(svnDiffStatus.getModificationType() + " " + svnDiffStatus.getPath());

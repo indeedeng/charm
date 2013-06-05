@@ -24,4 +24,6 @@ package com.indeed.charm.model;
 public interface LogEntryPath {
     public String getType();
     public String getPath();
+    public String getCopyPath();
+    public long getCopyRevision();
 }
