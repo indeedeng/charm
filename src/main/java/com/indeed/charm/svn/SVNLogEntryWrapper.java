@@ -112,4 +112,24 @@ public class SVNLogEntryWrapper implements LogEntry {
     public String getAdditionalField(String fieldName) {
         return additionalFields.get(fieldName);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SVNLogEntryWrapper that = (SVNLogEntryWrapper)o;
+        if (!entry.equals(that.entry)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return entry.hashCode();
+    }
 }

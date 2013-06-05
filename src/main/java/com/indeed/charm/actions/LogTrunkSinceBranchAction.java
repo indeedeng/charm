@@ -27,6 +27,7 @@ import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Set;
@@ -77,11 +78,15 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
                 final String message = entry.getLogMessage();
                 Matcher matcher = NUMERIC_REVISION_PATTERN.matcher(message);
                 while (matcher.find()) {
-                    possibles.put(Long.parseLong(matcher.group(1)), entry);
+                    final long rev = Long.parseLong(matcher.group(1));
+                    Collection<LogEntry> existing = possibles.get(rev);
+                    if (existing == null || !existing.contains(entry)) {
+                        possibles.put(rev, entry);
+                    }
                 }
             }
         };
-        vcsClient.visitBranchChangeLog(visitor, getProject(), getBranchDate(), 0, getPath());
+        vcsClient.visitBranchChangeLog(visitor, getProject(), getBranchDate(), true, 0, getPath());
         this.possibleMerges = possibles;
     }
 
