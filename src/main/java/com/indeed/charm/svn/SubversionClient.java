@@ -124,6 +124,10 @@ public class SubversionClient implements VCSClient {
         Map<String,LogEntryPath> paths = entry.getPaths();
         for (LogEntryPath path : paths.values()) {
             if (path.getCopyPath() == null) {
+                // skip parts of the commit that don't have a copyfrom-path
+                continue;
+            } else if (!path.getPath().startsWith("/" + project)) {
+                // skip parts of the commit that are in other projects
                 continue;
             } else if (!path.getCopyPath().endsWith("trunk")) {
                 throw new VCSException(new Exception("Not copied from trunk: " + path));
