@@ -19,16 +19,20 @@
 
 package com.indeed.charm.svn;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.*;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.internal.wc.DefaultSVNAuthenticationManager;
 import org.tmatesoft.svn.core.wc.*;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.util.*;
 
 import java.util.*;
 import java.io.File;
@@ -61,13 +65,68 @@ public class SubversionClient implements VCSClient {
     private final SVNClientManager clientManager;
     private final SVNRepository repo;
 
+    private static Logger logger = Logger.getLogger(SubversionClient.class);
+
+    private static class CustomSVNKitLogger extends SVNDebugLogAdapter {
+        private static Level mapLevel(java.util.logging.Level level) {
+            if (level.intValue() == java.util.logging.Level.OFF.intValue()) {
+                return Level.OFF;
+            } else if (level.intValue() == java.util.logging.Level.SEVERE.intValue()) {
+                return Level.ERROR;
+            } else if (level.intValue() == java.util.logging.Level.WARNING.intValue()) {
+                return Level.WARN;
+            } else if (level.intValue() == java.util.logging.Level.INFO.intValue()) {
+                return Level.INFO;
+            }
+            return Level.DEBUG;
+        }
+
+        @Override
+        public void log(SVNLogType logType, Throwable th, java.util.logging.Level logLevel) {
+            logger.log(mapLevel(logLevel), "" + logType.getShortName(), th);
+        }
+
+        @Override
+        public void log(SVNLogType logType, String message, java.util.logging.Level logLevel) {
+            logger.log(mapLevel(logLevel), "" + logType.getShortName() + ": " + message);
+        }
+
+        @Override
+        public void log(SVNLogType logType, String message, byte[] data) {
+            logger.log(Level.DEBUG, "" + logType.getShortName() + ": " + message + " [data length " + data.length + "]");
+        }
+    }
+
     static {
+        SVNDebugLog.setDefaultLog(new CustomSVNKitLogger());
+
         // TODO: how to configure this in charm.properties
         DAVRepositoryFactory.setup();
+        SVNRepositoryFactoryImpl.setup();
     }
 
     public SubversionClient(ReleaseEnvironment env) throws VCSException {
-        this(env, env.getUser(), env.getPassword());
+        this.env = env;
+        this.revisionUrlFormat = env.getRevisionUrlFormat();
+
+        try {
+            SVNURL url = SVNURL.parseURIDecoded(env.getRootUrl());
+            repo = SVNRepositoryFactory.create(url, null);
+            if (url.getProtocol().contains("ssh")) {
+                authManager = SVNWCUtil.createDefaultAuthenticationManager(env.getTempDir(),
+                        env.getSshUser(),
+                        env.getSshPassword(),
+                        env.getSshKeyfile(),
+                        env.getSshPassphrase(),
+                        false);
+            } else {
+                authManager = new BasicAuthenticationManager(env.getUser(), env.getPassword());
+            }
+            repo.setAuthenticationManager(authManager);
+            clientManager = SVNClientManager.newInstance(null, authManager);
+        } catch (SVNException e) {
+            throw new VCSException(e);
+        }
     }
 
     public SubversionClient(ReleaseEnvironment env, String user, String password) throws VCSException {
@@ -513,7 +572,14 @@ public class SubversionClient implements VCSClient {
     }
 
     public long getLatestRevision(String path) throws VCSException {
-        return getFile(path, -1, null);
+        long rev = -1;
+        try {
+            SVNDirEntry entry = repo.info(path, -1);
+            rev = entry.getRevision();
+        } catch (SVNException e) {
+            throw new VCSException(e);
+        }
+        return rev;
     }
 
     public static void main(String[] args) throws Exception {

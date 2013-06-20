@@ -101,6 +101,22 @@ public class ReleaseEnvironment {
         return properties.getProperty("repo.password", "");
     }
 
+    public String getSshUser() {
+        return properties.getProperty("repo.ssh2.username", "");
+    }
+
+    public String getSshPassword() {
+        return properties.getProperty("repo.ssh2.password", "");
+    }
+
+    public File getSshKeyfile() {
+        return new File(properties.getProperty("repo.ssh2.key", ""));
+    }
+
+    public String getSshPassphrase() {
+        return properties.getProperty("repo.ssh2.passphrase", "");
+    }
+
     public String getTrunkPath() {
         return properties.getProperty("repo.trunk.path", "/trunk/");
     }

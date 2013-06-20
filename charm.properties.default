@@ -21,6 +21,13 @@ repo.url=
 repo.user=
 repo.password=
 
+# ssh2 information required if repo.url is svn+ssh
+repo.ssh2.key=
+repo.ssh2.username=
+repo.ssh2.passphrase=
+repo.ssh2.password=
+repo.ssh2.port=
+
 # Additional roots to search for projects (relative to repo.url)
 # Example: ",common,shared" would search the root (/), /common, and /shared
 repo.roots=
