@@ -23,6 +23,10 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
@@ -39,7 +43,11 @@ public class ReleaseEnvironment {
     private static Logger log = Logger.getLogger(ReleaseEnvironment.class);
     public static Splitter versionSplitter = Splitter.on(".");
 
+    private final String propertiesPath;
+    private final ScheduledExecutorService propertiesLoader;
+
     private Properties properties;
+    private long propertiesLastModified = 0;
     private List<ReplacementPattern> linkifyPatterns;
     private List<ReplacementPattern> commitTransformPatterns;
     private BiMap<String,String> repoNameMap;
@@ -62,20 +70,51 @@ public class ReleaseEnvironment {
         this(null);
     }
     
-    public ReleaseEnvironment(ServletContext context) {
-        final String propertiesPath = getCharmPropertiesPath(context);
+    public ReleaseEnvironment(final ServletContext context) {
+        propertiesPath = getCharmPropertiesPath(context);
+        loadProperties();
+        propertiesLoader = Executors.newSingleThreadScheduledExecutor(
+                new ThreadFactory() {
+                    public Thread newThread(Runnable runnable) {
+                        return new Thread(runnable, "PropertiesLoader");
+                    }
+                }
+        );
+        propertiesLoader.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                loadProperties();
+            }
+        }, 1, 1, TimeUnit.MINUTES);
+    }
+
+    private final void loadProperties() {
         if (propertiesPath != null) {
-            properties = new Properties();
+            final Properties properties = new Properties();
             try {
-                InputStream in = new FileInputStream(propertiesPath);
-                properties.load(in);
-                log.info(properties);
+                File propsFile = new File(propertiesPath);
+                if (propertiesLastModified < propsFile.lastModified()) {
+                    InputStream in = new FileInputStream(propsFile);
+                    properties.load(in);
+                    log.info(properties);
+                    this.properties = properties;
+                    propertiesLastModified = propsFile.lastModified();
+                } else {
+                    log.info("No changes found in " + propertiesPath);
+                }
             } catch (IOException e) {
                 log.error("Failed to load properties", e);
             }
         } else {
             log.error("Missing charm.properties");
         }
+    }
+
+    public String getPropertiesPath() {
+        return propertiesPath;
+    }
+
+    public File getPropertiesDir() {
+        return new File(propertiesPath).getParentFile();
     }
 
     public File getBranchWorkingDirectory(String project, String branchDate, String user) {
