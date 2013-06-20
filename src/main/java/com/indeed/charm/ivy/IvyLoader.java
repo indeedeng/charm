@@ -182,7 +182,13 @@ public class IvyLoader {
                     name = altName;
                     env.putRepoName(altName, name);
                 } else {
-                    log.error(name + " is not a valid project");
+                    altName = name.replaceFirst("-", "/");
+                    if (vcsClient.checkExistsInHead(altName)) {
+                        name = altName;
+                        env.putRepoName(altName, name);
+                    } else {
+                        log.error(name + " is not a valid project");
+                    }
                 }
             }
         } catch (VCSException e) {
