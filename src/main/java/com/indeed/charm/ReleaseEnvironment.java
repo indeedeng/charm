@@ -98,6 +98,11 @@ public class ReleaseEnvironment {
                     log.info(properties);
                     this.properties = properties;
                     propertiesLastModified = propsFile.lastModified();
+                    unmemoize();
+                    if (issueTracker != null) {
+                        // reinitialize issue tracker only if already initialized
+                        initializeIssueTracker();
+                    }
                 } else {
                     log.info("No changes found in " + propertiesPath);
                 }
@@ -107,6 +112,13 @@ public class ReleaseEnvironment {
         } else {
             log.error("Missing charm.properties");
         }
+    }
+    
+    private final synchronized void unmemoize() {
+        linkifyPatterns = null;
+        commitTransformPatterns = null;
+        deployNameMap = null;
+        repoNameMap = null;
     }
 
     public String getPropertiesPath() {
@@ -172,7 +184,8 @@ public class ReleaseEnvironment {
         return properties.getProperty("repo.rev.url", "#%1$d");
     }
 
-    public List<ReplacementPattern> getLinkifyPatterns() {
+    public synchronized List<ReplacementPattern> getLinkifyPatterns() {
+        final Properties properties = this.properties;
         if (linkifyPatterns == null) {
             ImmutableList.Builder<ReplacementPattern> builder = ImmutableList.builder();
             String[] names = properties.getProperty("linkify.patterns", "JIRA,FISHEYE").split(",");
@@ -188,7 +201,8 @@ public class ReleaseEnvironment {
         return linkifyPatterns;
     }
 
-    public List<ReplacementPattern> getCommitTransformPatterns() {
+    public synchronized List<ReplacementPattern> getCommitTransformPatterns() {
+        final Properties properties = this.properties;
         if (commitTransformPatterns == null) {
             ImmutableList.Builder<ReplacementPattern> builder = ImmutableList.builder();
             String[] names = properties.getProperty("commit.patterns", "").split(",");
@@ -230,7 +244,7 @@ public class ReleaseEnvironment {
         return value;
     }
 
-    private BiMap<String, String> getRepoNameMap() {
+    private synchronized BiMap<String, String> getRepoNameMap() {
         if (repoNameMap == null) {
             final BiMap<String, String> map = HashBiMap.create();
             Iterable<String> entries = Splitter.on(',').trimResults().split(properties.getProperty("repo.name.map", ""));
@@ -259,7 +273,7 @@ public class ReleaseEnvironment {
         getRepoNameMap().put(repo, name);
     }
 
-    private BiMap<String, String> getDeployNameMap() {
+    private synchronized BiMap<String, String> getDeployNameMap() {
         if (deployNameMap == null) {
             final BiMap<String, String> map = HashBiMap.create();
             Iterable<String> entries = Splitter.on(',').trimResults().split(properties.getProperty("branch.deploy.name.map", ""));
