@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.indeed</groupId>
+  <artifactId>atlassian-ws</artifactId>
+  <version>0.1.4</version>
+  <name>Atlassian WS</name>
+  <description>Helper code for Atlassian web services</description>
+  <url>http://engineering.indeed.com/</url>
+  <licenses>
+    <license>
+      <name>GNU GPL v3</name>
+      <url>http://www.gnu.org/licenses/gpl.html</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>indeed</id>
+      <name>Indeed</name>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:svn:http://indeed-charm.googlecode.com/svn/</connection>
+    <url>http://indeed-charm.googlecode.com/svn/</url>
+  </scm>
+  <dependencies>
+  </dependencies>
+</project>

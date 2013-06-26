@@ -6,6 +6,10 @@ lib/atlassian-ws-0.1.4.jar -text
 lib/common-jira-0.1.2.jar -text
 lib/install-indeed-deps.sh -text
 /pom.xml -text
+repo/com/indeed/atlassian-ws/0.1.4/atlassian-ws-0.1.4.jar -text
+repo/com/indeed/atlassian-ws/0.1.4/atlassian-ws-0.1.4.pom -text
+repo/com/indeed/common-jira/0.1.2/common-jira-0.1.2.jar -text
+repo/com/indeed/common-jira/0.1.2/common-jira-0.1.2.pom -text
 src/main/Main.iml -text
 src/main/java/com/indeed/charm/ContextListener.java -text
 src/main/java/com/indeed/charm/ProjectsLoader.java -text
