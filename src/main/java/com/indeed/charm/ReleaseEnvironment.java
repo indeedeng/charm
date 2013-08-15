@@ -203,6 +203,9 @@ public class ReleaseEnvironment {
                 if (name.trim().length() > 0) {
                     final String pattern = properties.getProperty("linkify.pattern." + name);
                     final String replacement = properties.getProperty("linkify.replacement." + name);
+                    if(pattern == null || replacement == null) {
+                        continue;
+                    }
                     builder.add(new ReplacementPattern(name, pattern, replacement));
                 }
             }
