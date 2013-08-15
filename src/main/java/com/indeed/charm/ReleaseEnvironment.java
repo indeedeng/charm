@@ -146,7 +146,7 @@ public class ReleaseEnvironment {
         return new File(properties.getProperty("tmp.dir", "/tmp"));
     }
 
-    public String getRootUrl() {
+    public String getRootUrlString() {
         return properties.getProperty("repo.url", "");
     }
 

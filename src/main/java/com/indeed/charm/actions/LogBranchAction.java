@@ -38,13 +38,10 @@ public class LogBranchAction extends BaseBranchLogAction {
             if (getBranchDate() == null) {
                 setBranchDate(vcsClient.listBranches(project, 1, VCSClient.Ordering.REVERSE_BRANCH).get(0).getName());
             }
-            if (getPath() == null) {
-                setPath(".");
-            }
 
             setRevision(vcsClient.getBranchStartRevision(project, branchDate, true));
             final DisplayLogVisitor logVisitor = new WarningLogVisitor(env.getBranchWarnIfMissingPatterns());
-            vcsClient.visitBranchChangeLog(logVisitor, getProject(), getBranchDate(), true, 0, getPath());
+            vcsClient.visitBranchChangeLog(logVisitor, getProject(), getBranchDate(), true, 0);
             setLogEntries(ImmutableList.copyOf(logVisitor.getEntries().values()));
         } catch (VCSException e) {
             log.error("Failed to get branch log", e);

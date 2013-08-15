@@ -64,7 +64,7 @@ public class MergeToBranchAction extends BaseBranchAction {
             public Boolean call() throws Exception {
                 try {
                     // TODO log messages are svn-specific
-                    log("svn co " + env.getRootUrl() + project + env.getBranchPath() + branchDate + " " + branchDir);
+                    log("svn co " + env.getRootUrlString() + project + env.getBranchPath() + branchDate + " " + branchDir);
                     setStatus("Checking out " + project + " branch " + branchDate);
                     long r = vcsClient.checkoutBranch(project, branchDate, branchDir);
                     log("Checked out branch dir at revision " + r);

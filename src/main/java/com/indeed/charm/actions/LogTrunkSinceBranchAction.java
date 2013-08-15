@@ -48,9 +48,6 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
             if (getBranchDate() == null) {
                 setBranchDate(vcsClient.listBranches(project, 1, VCSClient.Ordering.REVERSE_BRANCH).get(0).getName());
             }
-            if (getPath() == null) {
-                setPath(".");
-            }
 
             loadPossibleMerges();
             final ExtractIssueKeyVisitor issueKeyExtractor = new ExtractIssueKeyVisitor(env);
@@ -62,7 +59,7 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
                     entry.setBranchMergeRevisions(possibleMerges.get(entry.getRevision()));
                 }
             };
-            vcsClient.visitTrunkChangeLogSinceBranch(logVisitor, getProject(), getBranchDate(), 0, getPath());
+            vcsClient.visitTrunkChangeLogSinceBranch(logVisitor, getProject(), getBranchDate(), 0);
             foundAdditionalFields = issueKeyExtractor.process();
             setLogEntries(ImmutableList.copyOf(logVisitor.getEntries().values()));
         } catch (VCSException e) {
@@ -86,7 +83,7 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
                 }
             }
         };
-        vcsClient.visitBranchChangeLog(visitor, getProject(), getBranchDate(), true, 0, getPath());
+        vcsClient.visitBranchChangeLog(visitor, getProject(), getBranchDate(), true, 0);
         this.possibleMerges = possibles;
     }
 
@@ -96,11 +93,6 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
 
     public String getSince() {
         return "branch " + branchDate;
-    }
-
-    public boolean isShowMergeToBranchLink() {
-        final String path = getPath();
-        return path == null || path.equals(".");
     }
 
     public Set<String> getFoundAdditionalFields() {

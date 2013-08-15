@@ -56,25 +56,25 @@ public interface VCSClient {
 
     void visitTagDiffStatus(DiffStatusVisitor visitor, String project, String version1, String version2) throws VCSException;
 
-    void visitTrunkChangeLog(LogEntryVisitor visitor, String project, int limit, String... paths) throws VCSException;
+    void visitTrunkChangeLog(LogEntryVisitor visitor, String project, int limit) throws VCSException;
 
-    void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, int limit, String... paths) throws VCSException;
+    void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, int limit) throws VCSException;
 
-    void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, boolean extendToBranchPointUsingComment, int limit, String... paths) throws VCSException;
+    void visitBranchChangeLog(LogEntryVisitor visitor, String project, String branchDate, boolean extendToBranchPointUsingComment, int limit) throws VCSException;
 
-    void visitTagChangeLog(LogEntryVisitor visitor, String project, String tag, int limit, String... paths) throws VCSException;
+    void visitTagChangeLog(LogEntryVisitor visitor, String project, String tag, int limit) throws VCSException;
 
     long getBranchStartRevision(String project, String branchDate) throws VCSException;
 
     long getBranchStartRevision(String project, String branchDate, boolean extendToBranchPointFromComment) throws VCSException;
 
-    void visitTrunkChangeLogSinceBranch(LogEntryVisitor visitor, String project, String branchDate, int limit, String... paths) throws VCSException;
+    void visitTrunkChangeLogSinceBranch(LogEntryVisitor visitor, String project, String branchDate, int limit) throws VCSException;
 
     LogEntry getTagFirstLogEntry(String project, String tag) throws VCSException;
 
     long getTagFirstRevision(String project, String tag) throws VCSException;
 
-    void visitTrunkChangeLogSinceTag(LogEntryVisitor visitor, String project, String tag, int limit, String... paths) throws VCSException;
+    void visitTrunkChangeLogSinceTag(LogEntryVisitor visitor, String project, String tag, int limit) throws VCSException;
 
     List<DirEntry> listBranches(String project, int limit, Ordering ordering) throws VCSException;
 

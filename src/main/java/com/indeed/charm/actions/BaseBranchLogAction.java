@@ -29,17 +29,8 @@ import com.google.common.collect.Sets;
 /**
  */
 public abstract class BaseBranchLogAction extends BaseBranchAction {
-    private String path;
     private List<LogEntry> logEntries;
     private Set<Long> warnRevisions = Sets.newHashSet();
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
 
     public List<LogEntry> getLogEntries() {
         return logEntries;
