@@ -162,6 +162,10 @@ public class ReleaseEnvironment {
         return properties.getProperty("repo.ssh2.username", "");
     }
 
+    public Integer getSshPort() {
+        return Integer.parseInt(properties.getProperty("repo.ssh2.port", "22"));
+    }
+
     public String getSshPassword() {
         return properties.getProperty("repo.ssh2.password", "");
     }

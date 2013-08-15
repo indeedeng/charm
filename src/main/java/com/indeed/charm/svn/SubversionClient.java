@@ -19,41 +19,39 @@
 
 package com.indeed.charm.svn;
 
-import com.google.common.collect.ImmutableMap;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
-import org.tmatesoft.svn.core.*;
-import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
-import org.tmatesoft.svn.core.internal.wc.DefaultSVNAuthenticationManager;
-import org.tmatesoft.svn.core.wc.*;
-import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
-import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.io.SVNRepository;
-import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.tmatesoft.svn.util.*;
-
-import java.util.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.indeed.charm.ReleaseEnvironment;
 import com.indeed.charm.VCSClient;
 import com.indeed.charm.VCSException;
-import com.indeed.charm.model.LogEntry;
-import com.indeed.charm.model.LogEntryPath;
-import com.indeed.charm.model.CommitInfo;
-import com.indeed.charm.model.DiffStatus;
-import com.indeed.charm.model.DirEntry;
-import com.indeed.charm.actions.LogEntryVisitor;
 import com.indeed.charm.actions.DiffStatusVisitor;
+import com.indeed.charm.actions.LogEntryVisitor;
+import com.indeed.charm.model.*;
+import com.jcraft.jsch.agentproxy.AgentProxyException;
+import com.jcraft.jsch.agentproxy.ConnectorFactory;
+import com.jcraft.jsch.agentproxy.TrileadAgentProxy;
+import com.trilead.ssh2.auth.AgentProxy;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.tmatesoft.svn.core.*;
+import org.tmatesoft.svn.core.auth.*;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
+import org.tmatesoft.svn.core.wc.*;
+import org.tmatesoft.svn.util.SVNDebugLog;
+import org.tmatesoft.svn.util.SVNDebugLogAdapter;
+import org.tmatesoft.svn.util.SVNLogType;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  */
@@ -105,20 +103,54 @@ public class SubversionClient implements VCSClient {
         SVNRepositoryFactoryImpl.setup();
     }
 
-    public SubversionClient(ReleaseEnvironment env) throws VCSException {
+    public SubversionClient(final ReleaseEnvironment env) throws VCSException {
+        AgentProxy agentProxyInit = null; /* There has to be a better way... right? */
+
         this.env = env;
         this.revisionUrlFormat = env.getRevisionUrlFormat();
 
         try {
             SVNURL url = SVNURL.parseURIDecoded(env.getRootUrl());
             repo = SVNRepositoryFactory.create(url, null);
+            try {
+                agentProxyInit = new TrileadAgentProxy(ConnectorFactory.getDefault().createConnector());
+            } catch (AgentProxyException e) {
+                logger.debug("Unable to use SSH agent", e);
+            }
+            final AgentProxy agentProxy = agentProxyInit;
             if (url.getProtocol().contains("ssh")) {
-                authManager = SVNWCUtil.createDefaultAuthenticationManager(env.getTempDir(),
-                        env.getSshUser(),
-                        env.getSshPassword(),
-                        env.getSshKeyfile(),
-                        env.getSshPassphrase(),
-                        false);
+                if(agentProxy != null) {
+                    authManager = SVNWCUtil.createDefaultAuthenticationManager();
+                    authManager.setAuthenticationProvider(new ISVNAuthenticationProvider() {
+                        boolean failedOnce = false;
+
+                        @Override
+                        public SVNAuthentication requestClientAuthentication(String s, SVNURL svnurl, String s2, SVNErrorMessage svnErrorMessage, SVNAuthentication svnAuthentication, boolean b) {
+                            if(svnErrorMessage != null) {
+                                logger.info(svnErrorMessage);
+                                if(failedOnce) {
+                                    return null;
+                                } else {
+                                    failedOnce = true;
+                                }
+                            }
+                            return new SVNSSHAuthentication(env.getSshUser(), agentProxy, env.getSshPort(), svnurl, false);
+                        }
+
+                        @Override
+                        public int acceptServerAuthentication(SVNURL svnurl, String realm, Object certificate, boolean resultMayBeStored) {
+                            return ISVNAuthenticationProvider.ACCEPTED; // FIXME: Need less willful blindness here.
+                        }
+                    });
+                } else {
+                    authManager = SVNWCUtil.createDefaultAuthenticationManager(
+                            env.getTempDir(),
+                            env.getSshUser(),
+                            env.getSshPassword(),
+                            env.getSshKeyfile(),
+                            env.getSshPassphrase(),
+                            false);
+                }
             } else {
                 authManager = new BasicAuthenticationManager(env.getUser(), env.getPassword());
             }

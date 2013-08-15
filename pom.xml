@@ -48,7 +48,12 @@
         <dependency>
             <groupId>org.tmatesoft.svnkit</groupId>
             <artifactId>svnkit</artifactId>
-            <version>1.7.9</version>
+            <version>1.7.10</version>
+        </dependency>
+        <dependency>
+            <groupId>com.trilead</groupId>
+            <artifactId>trilead-ssh2</artifactId>
+            <version>1.0.0-build217</version>
         </dependency>
 
         <dependency>
