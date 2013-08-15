@@ -88,8 +88,8 @@ public class ReleaseEnvironment {
     }
 
     private final void loadProperties() {
+        final Properties properties = new Properties();
         if (propertiesPath != null) {
-            final Properties properties = new Properties();
             try {
                 File propsFile = new File(propertiesPath);
                 if (propertiesLastModified < propsFile.lastModified()) {
@@ -110,7 +110,13 @@ public class ReleaseEnvironment {
                 log.error("Failed to load properties", e);
             }
         } else {
-            log.error("Missing charm.properties");
+            try {
+                InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("charm.properties");
+                properties.load(in);
+                this.properties = properties;
+            } catch(IOException e) {
+                log.error("Failed to load charm.properties from classpath", e);
+            }
         }
     }
     
