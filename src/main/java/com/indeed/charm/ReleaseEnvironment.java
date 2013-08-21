@@ -88,8 +88,8 @@ public class ReleaseEnvironment {
     }
 
     private final void loadProperties() {
+        final Properties properties = new Properties();
         if (propertiesPath != null) {
-            final Properties properties = new Properties();
             try {
                 File propsFile = new File(propertiesPath);
                 if (propertiesLastModified < propsFile.lastModified()) {
@@ -110,7 +110,13 @@ public class ReleaseEnvironment {
                 log.error("Failed to load properties", e);
             }
         } else {
-            log.error("Missing charm.properties");
+            try {
+                InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("charm.properties");
+                properties.load(in);
+                this.properties = properties;
+            } catch(IOException e) {
+                log.error("Failed to load charm.properties from classpath", e);
+            }
         }
     }
     
@@ -140,7 +146,7 @@ public class ReleaseEnvironment {
         return new File(properties.getProperty("tmp.dir", "/tmp"));
     }
 
-    public String getRootUrl() {
+    public String getRootUrlString() {
         return properties.getProperty("repo.url", "");
     }
 
@@ -154,6 +160,10 @@ public class ReleaseEnvironment {
 
     public String getSshUser() {
         return properties.getProperty("repo.ssh2.username", "");
+    }
+
+    public Integer getSshPort() {
+        return Integer.parseInt(properties.getProperty("repo.ssh2.port", "22"));
     }
 
     public String getSshPassword() {
@@ -193,6 +203,9 @@ public class ReleaseEnvironment {
                 if (name.trim().length() > 0) {
                     final String pattern = properties.getProperty("linkify.pattern." + name);
                     final String replacement = properties.getProperty("linkify.replacement." + name);
+                    if(pattern == null || replacement == null) {
+                        continue;
+                    }
                     builder.add(new ReplacementPattern(name, pattern, replacement));
                 }
             }

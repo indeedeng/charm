@@ -36,6 +36,9 @@ public class SVNLogEntryVisitor implements ISVNLogEntryHandler {
     }
 
     public void handleLogEntry(SVNLogEntry svnLogEntry) throws SVNException {
+        if (svnLogEntry.getRevision() == -1) {
+            return;
+        }
         if (oldestEntry == null || oldestEntry.getRevision() > svnLogEntry.getRevision()) {
             oldestEntry = svnLogEntry;
         }
