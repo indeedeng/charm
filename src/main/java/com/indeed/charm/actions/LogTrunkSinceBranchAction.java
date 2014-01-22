@@ -98,4 +98,8 @@ public class LogTrunkSinceBranchAction extends BaseBranchLogAction {
     public Set<String> getFoundAdditionalFields() {
         return foundAdditionalFields;
     }
+
+    public boolean isShowMergeToBranchLink() {
+        return true;
+    }
 }
